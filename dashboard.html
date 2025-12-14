@@ -1148,23 +1148,10 @@ async function sendMessage() {
         
         if (!response.ok) throw new Error('HTTP ' + response.status);
         
-        const data = await response.json();
+        const rawData = await response.text();
         
-        // Extraire la réponse
-        let responseText = '';
-        if (typeof data === 'string') {
-            responseText = data;
-        } else if (data.message) {
-            responseText = data.message;
-        } else if (data.response) {
-            responseText = data.response;
-        } else if (Array.isArray(data) && data[0]) {
-            responseText = data[0].message || data[0].response || JSON.stringify(data[0], null, 2);
-        } else {
-            responseText = JSON.stringify(data, null, 2);
-        }
-        
-        responseText = responseText.replace(/\\n/g, '\n') || 'Réponse reçue.';
+        // Extraire intelligemment la réponse
+        let responseText = extractMessageFromResponse(rawData);
         
         const assistantMsg = {
             id: Date.now(),
@@ -1240,17 +1227,60 @@ function formatMarkdown(text) {
     if (!text) return '';
     
     let html = escapeHtml(text);
-    html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-    html = html.replace(/^- (.+)$/gm, '• $1');
     
-    return html.split(/\n\n+/).map(p => {
+    // Blocs de code (```)
+    html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre style="background:#0a0a0b;padding:12px 16px;border-radius:8px;overflow-x:auto;margin:12px 0;border:1px solid var(--border-primary);"><code style="color:#e2e8f0;font-family:monospace;font-size:13px;">$2</code></pre>');
+    
+    // Code inline (`)
+    html = html.replace(/`([^`]+)`/g, '<code style="background:var(--bg-hover);color:var(--accent-gold);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:13px;">$1</code>');
+    
+    // Titres ## et ###
+    html = html.replace(/^### (.+)$/gm, '<h4 style="color:var(--accent-gold);font-size:14px;font-weight:600;margin:16px 0 8px;display:flex;align-items:center;gap:8px;">$1</h4>');
+    html = html.replace(/^## (.+)$/gm, '<h3 style="color:var(--text-primary);font-size:15px;font-weight:600;margin:20px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border-primary);">$1</h3>');
+    html = html.replace(/^# (.+)$/gm, '<h2 style="color:var(--text-primary);font-size:17px;font-weight:700;margin:24px 0 12px;">$1</h2>');
+    
+    // Gras (**)
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--text-primary);font-weight:600;">$1</strong>');
+    
+    // Italique (*)
+    html = html.replace(/\*([^*]+)\*/g, '<em style="color:var(--text-secondary);">$1</em>');
+    
+    // Listes à puces (- ou •)
+    html = html.replace(/^- (.+)$/gm, '<li style="margin:6px 0;padding-left:4px;color:var(--text-primary);">$1</li>');
+    html = html.replace(/^• (.+)$/gm, '<li style="margin:6px 0;padding-left:4px;color:var(--text-primary);">$1</li>');
+    
+    // Envelopper les listes consécutives
+    html = html.replace(/(<li[^>]*>.*<\/li>\n?)+/g, '<ul style="margin:12px 0;padding-left:20px;list-style:none;">$&</ul>');
+    
+    // Ajouter les puces dorées
+    html = html.replace(/<li/g, '<li style="position:relative;padding-left:16px;"><span style="position:absolute;left:0;color:var(--accent-gold);">•</span');
+    
+    // Liens [texte](url)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:var(--accent-gold);text-decoration:underline;">$1</a>');
+    
+    // Emojis colorés
+    html = html.replace(/✅/g, '<span style="color:#30d158;">✅</span>');
+    html = html.replace(/❌/g, '<span style="color:#ff453a;">❌</span>');
+    html = html.replace(/⚠️/g, '<span style="color:#ffd60a;">⚠️</span>');
+    html = html.replace(/🟢/g, '<span style="color:#30d158;">🟢</span>');
+    html = html.replace(/🔴/g, '<span style="color:#ff453a;">🔴</span>');
+    html = html.replace(/⚪/g, '<span style="color:#8e8e93;">⚪</span>');
+    html = html.replace(/🔄/g, '<span style="color:#0a84ff;">🔄</span>');
+    html = html.replace(/🏗/g, '<span style="color:#ffd60a;">🏗</span>');
+    html = html.replace(/👉/g, '<span style="color:#ffd60a;">👉</span>');
+    
+    // Citations (lignes commençant par >)
+    html = html.replace(/^&gt; (.+)$/gm, '<blockquote style="border-left:3px solid var(--accent-gold);padding-left:12px;margin:12px 0;color:var(--text-secondary);font-style:italic;">$1</blockquote>');
+    
+    // Paragraphes
+    html = html.split(/\n\n+/).map(p => {
         p = p.trim();
-        if (!p || p.startsWith('<')) return p;
-        return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+        if (!p) return '';
+        if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<pre') || p.startsWith('<blockquote')) return p;
+        return `<p style="margin:8px 0;line-height:1.6;">${p.replace(/\n/g, '<br>')}</p>`;
     }).join('');
+    
+    return html;
 }
 
 function showMessages() {
@@ -1305,6 +1335,63 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Extraction intelligente des messages de réponse
+function extractMessageFromResponse(rawData) {
+    if (!rawData) return 'Réponse vide reçue.';
+    
+    // Essayer de parser comme JSON
+    try {
+        const data = JSON.parse(rawData);
+        
+        // Chercher le message dans différents formats
+        const textFields = ['message', 'response', 'text', 'output', 'content', 'reply'];
+        
+        // Format direct: { message: "..." }
+        for (const field of textFields) {
+            if (data[field] && typeof data[field] === 'string') {
+                return cleanMessage(data[field]);
+            }
+        }
+        
+        // Format tableau: [{ message: "..." }]
+        if (Array.isArray(data) && data.length > 0) {
+            const first = data[0];
+            for (const field of textFields) {
+                if (first[field] && typeof first[field] === 'string') {
+                    return cleanMessage(first[field]);
+                }
+            }
+        }
+        
+        // Format avec success: { success: true, response: "..." }
+        if (data.success !== undefined) {
+            for (const field of textFields) {
+                if (data[field] && typeof data[field] === 'string') {
+                    return cleanMessage(data[field]);
+                }
+            }
+        }
+        
+        // Dernier recours: JSON formaté dans un bloc de code
+        return '```json\n' + JSON.stringify(data, null, 2) + '\n```';
+        
+    } catch (e) {
+        // Ce n'est pas du JSON, c'est du texte brut
+        return cleanMessage(rawData);
+    }
+}
+
+// Nettoyer les caractères échappés
+function cleanMessage(text) {
+    if (!text) return '';
+    return text
+        .replace(/\\n/g, '\n')
+        .replace(/\\t/g, '\t')
+        .replace(/\\"/g, '"')
+        .replace(/\\\\/g, '\\')
+        .trim();
 }
 
 function handleKeyDown(event) {
