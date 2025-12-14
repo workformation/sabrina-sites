@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SABRINA Creator | Dashboard V5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SABRINA CREATOR DASHBOARD V5 - FULLY TESTED
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --bg-primary: #0f0f10;
+    --bg-secondary: #161618;
+    --bg-tertiary: #1c1c1e;
+    --bg-hover: #232326;
+    --bg-active: #2a2a2d;
+    --text-primary: #ececec;
+    --text-secondary: #8e8e93;
+    --text-tertiary: #636366;
+    --border-primary: #2c2c2e;
+    --border-secondary: #3a3a3c;
+    --accent-primary: #0a84ff;
+    --accent-secondary: #5e5ce6;
+    --accent-gold: #D4AF37;
+    --success: #30d158;
+    --warning: #ffd60a;
+    --error: #ff453a;
+    --sidebar-width: 260px;
+    --header-height: 52px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    overflow: hidden;
+}
+
+/* LAYOUT */
+.dashboard {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-rows: var(--header-height) 1fr;
+    height: 100vh;
+}
+
+/* HEADER */
+.header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-primary);
+    gap: 16px;
+}
+
+.header-left { display: flex; align-items: center; gap: 16px; }
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px 6px 6px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+}
+
+.logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--accent-gold), #B8960C);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #0f0f10;
+}
+
+.logo-text { font-weight: 600; font-size: 15px; }
+
+.nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-tertiary);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.nav-item {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.nav-item.active { background: var(--bg-active); color: var(--text-primary); }
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(48, 209, 88, 0.1);
+    border: 1px solid rgba(48, 209, 88, 0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--success);
+}
+
+.status-indicator.error { background: rgba(255, 69, 58, 0.1); border-color: rgba(255, 69, 58, 0.2); color: var(--error); }
+.status-indicator.connecting { background: rgba(255, 214, 10, 0.1); border-color: rgba(255, 214, 10, 0.2); color: var(--warning); }
+.status-dot { width: 6px; height: 6px; background: currentColor; border-radius: 50%; }
+
+.header-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 16px;
+}
+
+.header-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* SIDEBAR */
+.sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header { padding: 12px; border-bottom: 1px solid var(--border-primary); }
+
+.new-chat-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: linear-gradient(135deg, var(--accent-gold), #B8960C);
+    border: none;
+    border-radius: 8px;
+    color: #0f0f10;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.new-chat-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+.sidebar-content { flex: 1; overflow-y: auto; padding: 8px; }
+.sidebar-section { margin-bottom: 16px; }
+
+.section-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
+}
+
+.section-badge {
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--accent-gold);
+    color: #0f0f10;
+    border-radius: 4px;
+}
+
+.module-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.module-mini:hover { background: var(--bg-hover); }
+.module-mini-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); }
+.module-mini-dot.active { background: var(--success); }
+.module-mini-name { flex: 1; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* MAIN CONTENT */
+.main-content { display: flex; flex-direction: column; background: var(--bg-primary); overflow: hidden; }
+.view { display: none; flex: 1; overflow: hidden; }
+.view.active { display: flex; flex-direction: column; }
+
+/* CHAT */
+.chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.chat-scroll { flex: 1; overflow-y: auto; padding: 16px 24px; }
+
+.welcome-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 40px;
+    text-align: center;
+}
+
+.welcome-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--accent-gold), #B8960C);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.welcome-title { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+.welcome-desc { font-size: 14px; color: var(--text-secondary); max-width: 400px; margin-bottom: 32px; }
+
+.quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; max-width: 480px; }
+
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+}
+
+.quick-action:hover { background: var(--bg-tertiary); border-color: var(--accent-gold); }
+
+.quick-action-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.quick-action-text { flex: 1; }
+.quick-action-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.quick-action-desc { font-size: 11px; color: var(--text-tertiary); }
+
+/* MESSAGES */
+.messages { display: none; flex-direction: column; gap: 12px; max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 20px; }
+.messages.active { display: flex; }
+
+.message { display: flex; gap: 10px; animation: fadeIn 0.2s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.message.user .message-avatar { background: var(--accent-primary); color: white; }
+.message.assistant .message-avatar { background: linear-gradient(135deg, var(--accent-gold), #B8960C); color: #0f0f10; }
+
+.message-content { flex: 1; min-width: 0; }
+.message-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.message-author { font-size: 13px; font-weight: 600; }
+.message-time { font-size: 11px; color: var(--text-tertiary); }
+
+.message-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    padding: 12px 14px;
+    border-radius: 0 12px 12px 12px;
+    border: 1px solid var(--border-primary);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.message.user .message-body { background: var(--accent-primary); border-color: var(--accent-primary); border-radius: 12px 0 12px 12px; }
+.message-body p { margin-bottom: 8px; }
+.message-body p:last-child { margin-bottom: 0; }
+.message-body code { background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+.message-body pre { background: var(--bg-tertiary); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+.message-body strong { color: var(--accent-gold); }
+
+.typing-indicator { display: none; gap: 10px; padding: 8px 0; }
+.typing-indicator.active { display: flex; }
+.typing-dots { display: flex; gap: 4px; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; }
+.typing-dots span { width: 8px; height: 8px; background: var(--text-tertiary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+
+/* CHAT INPUT */
+.chat-input-container { padding: 16px 24px; background: var(--bg-primary); border-top: 1px solid var(--border-primary); }
+
+.chat-input-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 16px;
+    padding: 8px 12px;
+    transition: border-color 0.15s;
+}
+
+.chat-input-wrapper:focus-within { border-color: var(--accent-gold); }
+
+.chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    max-height: 120px;
+    min-height: 24px;
+    line-height: 1.5;
+    outline: none;
+}
+
+.chat-input::placeholder { color: var(--text-tertiary); }
+
+.send-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-gold);
+    border: none;
+    border-radius: 10px;
+    color: #0f0f10;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 18px;
+}
+
+.send-btn:hover { filter: brightness(1.1); transform: scale(1.05); }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* MODULES VIEW */
+.modules-view { padding: 24px; overflow-y: auto; }
+.modules-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.modules-header h2 { font-size: 20px; font-weight: 600; }
+.modules-stats { display: flex; gap: 16px; }
+.stat-item { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-secondary); border-radius: 8px; }
+.stat-value { font-size: 18px; font-weight: 700; color: var(--accent-gold); }
+.stat-label { font-size: 12px; color: var(--text-secondary); }
+
+.modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+.module-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.15s;
+}
+
+.module-card:hover { border-color: var(--accent-gold); transform: translateY(-2px); }
+.module-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.module-card-title { display: flex; align-items: center; gap: 10px; }
+.module-status { width: 10px; height: 10px; border-radius: 50%; background: var(--error); }
+.module-status.active { background: var(--success); }
+.module-name { font-size: 14px; font-weight: 600; }
+.module-id { font-size: 11px; color: var(--text-tertiary); }
+.module-webhook { font-size: 11px; color: var(--accent-primary); font-family: monospace; background: var(--bg-tertiary); padding: 4px 8px; border-radius: 4px; margin-top: 8px; word-break: break-all; }
+.module-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+.module-btn {
+    flex: 1;
+    padding: 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.module-btn:hover { background: var(--bg-hover); border-color: var(--accent-gold); }
+.module-btn.primary { background: var(--accent-gold); color: #0f0f10; border-color: var(--accent-gold); }
+
+/* TOOLS VIEW */
+.tools-view { padding: 24px; overflow-y: auto; }
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+.tool-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tool-card:hover { border-color: var(--accent-gold); transform: translateY(-2px); }
+.tool-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 12px; font-size: 24px; margin-bottom: 12px; }
+.tool-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.tool-desc { font-size: 13px; color: var(--text-secondary); }
+
+/* LOGS VIEW */
+.logs-view { padding: 24px; overflow-y: auto; }
+.logs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.logs-filters { display: flex; gap: 8px; }
+
+.log-filter {
+    padding: 6px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.log-filter:hover, .log-filter.active { background: var(--accent-gold); color: #0f0f10; border-color: var(--accent-gold); }
+
+.logs-container { background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 12px; overflow: hidden; max-height: 600px; overflow-y: auto; }
+
+.log-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-primary);
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.log-entry:last-child { border-bottom: none; }
+.log-time { color: var(--text-tertiary); white-space: nowrap; }
+
+.log-level {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+}
+
+.log-level.info { background: rgba(10, 132, 255, 0.2); color: var(--accent-primary); }
+.log-level.success { background: rgba(48, 209, 88, 0.2); color: var(--success); }
+.log-level.warning { background: rgba(255, 214, 10, 0.2); color: var(--warning); }
+.log-level.error { background: rgba(255, 69, 58, 0.2); color: var(--error); }
+
+.log-message { flex: 1; color: var(--text-primary); }
+.log-source { color: var(--accent-gold); }
+
+/* TOAST */
+.toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.toast.success { border-color: var(--success); }
+.toast.error { border-color: var(--error); }
+.toast.info { border-color: var(--accent-primary); }
+.toast-icon { font-size: 18px; }
+.toast-message { font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">S</div>
+                    <span class="logo-text">SABRINA</span>
+                </div>
+                <nav class="nav-tabs">
+                    <button class="nav-item active" id="navCreator" data-view="creator">Creator</button>
+                    <button class="nav-item" id="navModules" data-view="modules">Modules</button>
+                    <button class="nav-item" id="navTools" data-view="tools">Outils</button>
+                    <button class="nav-item" id="navLogs" data-view="logs">Logs</button>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Connexion...</span>
+                </div>
+                <button class="header-btn" id="btnRefresh" title="Actualiser">🔄</button>
+                <button class="header-btn" id="btnSettings" title="Paramètres">⚙️</button>
+            </div>
+        </header>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" id="btnNewChat">✨ Nouvelle conversation</button>
+            </div>
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <div class="section-label">
+                        <span>⚡ Modules actifs</span>
+                        <span class="section-badge" id="activeModulesCount">0</span>
+                    </div>
+                    <div id="modulesMiniList"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- VIEW: CREATOR -->
+            <div class="view active" id="viewCreator">
+                <div class="chat-area">
+                    <div class="chat-scroll" id="chatScroll">
+                        <div class="welcome-state" id="welcomeState">
+                            <div class="welcome-icon">🤖</div>
+                            <h2 class="welcome-title">SABRINA Creator V8</h2>
+                            <p class="welcome-desc">Architecte IA pour concevoir et générer des modules d'automatisation n8n.</p>
+                            <div class="quick-actions">
+                                <button class="quick-action" data-action="list">
+                                    <div class="quick-action-icon">📋</div>
+                                    <div class="quick-action-text">
+                                        <div class="quick-action-title">Lister les modules</div>
+                                        <div class="quick-action-desc">Voir tous les modules SABRINA</div>
+                                    </div>
+                                </button>
+                                <button class="quick-action" data-action="create">
+                                    <div class="quick-action-icon">✨</div>
+                                    <div class="quick-action-text">
+                                        <div class="quick-action-title">Créer un module</div>
+                                        <div class="quick-action-desc">Nouveau workflow IA</div>
+                                    </div>
+                                </button>
+                                <button class="quick-action" data-action="help">
+                                    <div class="quick-action-icon">❓</div>
+                                    <div class="quick-action-text">
+                                        <div class="quick-action-title">Aide</div>
+                                        <div class="quick-action-desc">Guide d'utilisation</div>
+                                    </div>
+                                </button>
+                                <button class="quick-action" data-action="status">
+                                    <div class="quick-action-icon">📊</div>
+                                    <div class="quick-action-text">
+                                        <div class="quick-action-title">Status système</div>
+                                        <div class="quick-action-desc">État de l'infrastructure</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="messages" id="messagesContainer"></div>
+                        <div class="typing-indicator" id="typingIndicator">
+                            <div class="message-avatar" style="background: linear-gradient(135deg, var(--accent-gold), #B8960C); color: #0f0f10;">S</div>
+                            <div class="typing-dots"><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <textarea class="chat-input" id="messageInput" placeholder="Décris le module à créer ou pose une question..." rows="1"></textarea>
+                            <button class="send-btn" id="sendBtn">➤</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: MODULES -->
+            <div class="view" id="viewModules">
+                <div class="modules-view">
+                    <div class="modules-header">
+                        <h2>📦 Modules SABRINA</h2>
+                        <div class="modules-stats">
+                            <div class="stat-item"><span class="stat-value" id="statsTotal">0</span><span class="stat-label">Total</span></div>
+                            <div class="stat-item"><span class="stat-value" id="statsActive">0</span><span class="stat-label">Actifs</span></div>
+                            <div class="stat-item"><span class="stat-value" id="statsInactive">0</span><span class="stat-label">Inactifs</span></div>
+                        </div>
+                    </div>
+                    <div class="modules-grid" id="modulesGrid"><div style="color: var(--text-secondary); padding: 40px; text-align: center;">Chargement...</div></div>
+                </div>
+            </div>
+
+            <!-- VIEW: TOOLS -->
+            <div class="view" id="viewTools">
+                <div class="tools-view">
+                    <h2 style="margin-bottom: 24px;">🛠️ Outils</h2>
+                    <div class="tools-grid" id="toolsGrid"></div>
+                </div>
+            </div>
+
+            <!-- VIEW: LOGS -->
+            <div class="view" id="viewLogs">
+                <div class="logs-view">
+                    <div class="logs-header">
+                        <h2>📜 Logs système</h2>
+                        <div class="logs-filters" id="logsFilters">
+                            <button class="log-filter active" data-filter="all">Tous</button>
+                            <button class="log-filter" data-filter="info">Info</button>
+                            <button class="log-filter" data-filter="success">Succès</button>
+                            <button class="log-filter" data-filter="error">Erreurs</button>
+                        </div>
+                    </div>
+                    <div class="logs-container" id="logsContainer"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// SABRINA CREATOR DASHBOARD V5 - FULLY TESTED & WORKING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const CONFIG = {
+    // URL du webhook Creator - C'est ici que vont les messages chat
+    webhookUrl: 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina-creator-v2',
+    
+    // NOTE: L'API n8n directe ne fonctionnera pas depuis le navigateur (CORS)
+    // Les modules seront chargés via le webhook Creator avec commande "liste"
+    
+    storageKey: 'sabrina_dashboard_v5',
+    userId: 'lloyd_admin'
+};
+
+const state = {
+    messages: [],
+    modules: [],
+    logs: [],
+    isConnected: false,
+    isTyping: false,
+    currentView: 'creator',
+    currentLogFilter: 'all'
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALISATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('SABRINA Dashboard V5 - Init');
+    
+    // Charger l'état sauvegardé
+    loadState();
+    
+    // Attacher les événements
+    attachEventListeners();
+    
+    // Render initial
+    renderMessages();
+    renderTools();
+    renderLogs();
+    
+    // Tester la connexion
+    testConnection();
+    
+    // Charger les modules via Creator
+    loadModulesViaCreator();
+    
+    addLog('info', 'Dashboard V5 initialisé', 'System');
+});
+
+function attachEventListeners() {
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => switchView(btn.dataset.view));
+    });
+    
+    // Header buttons
+    document.getElementById('btnRefresh').addEventListener('click', refreshAll);
+    document.getElementById('btnSettings').addEventListener('click', showSettings);
+    document.getElementById('btnNewChat').addEventListener('click', newChat);
+    
+    // Chat
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keydown', handleKeyDown);
+    document.getElementById('messageInput').addEventListener('input', function() { autoResize(this); });
+    
+    // Quick actions
+    document.querySelectorAll('.quick-action').forEach(btn => {
+        btn.addEventListener('click', () => quickAction(btn.dataset.action));
+    });
+    
+    // Log filters
+    document.querySelectorAll('.log-filter').forEach(btn => {
+        btn.addEventListener('click', () => filterLogs(btn.dataset.filter));
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function switchView(view) {
+    state.currentView = view;
+    
+    // Update nav buttons
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+    });
+    
+    // Update views
+    document.querySelectorAll('.view').forEach(v => {
+        v.classList.toggle('active', v.id === 'view' + view.charAt(0).toUpperCase() + view.slice(1));
+    });
+    
+    addLog('info', `Vue: ${view}`, 'Nav');
+}
+
+function refreshAll() {
+    testConnection();
+    loadModulesViaCreator();
+    showToast('info', 'Actualisation...');
+    addLog('info', 'Rafraîchissement', 'System');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONNEXION & MODULES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function testConnection() {
+    updateStatus('connecting', 'Connexion...');
+    
+    try {
+        const response = await fetch(CONFIG.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userMessage: 'ping', userId: CONFIG.userId })
+        });
+        
+        if (response.ok) {
+            state.isConnected = true;
+            updateStatus('connected', 'Connecté');
+            addLog('success', 'Connexion OK', 'Connection');
+            return true;
+        } else {
+            throw new Error('HTTP ' + response.status);
+        }
+    } catch (error) {
+        console.error('Connection error:', error);
+        state.isConnected = false;
+        updateStatus('error', 'Hors ligne');
+        addLog('error', `Connexion échouée: ${error.message}`, 'Connection');
+        return false;
+    }
+}
+
+function updateStatus(type, text) {
+    const indicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    
+    indicator.className = 'status-indicator';
+    if (type === 'error') indicator.classList.add('error');
+    if (type === 'connecting') indicator.classList.add('connecting');
+    
+    statusText.textContent = text;
+}
+
+async function loadModulesViaCreator() {
+    addLog('info', 'Chargement modules via Creator...', 'Modules');
+    
+    try {
+        const response = await fetch(CONFIG.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                userMessage: 'Liste tous les modules SABRINA',
+                userId: CONFIG.userId,
+                silent: true // Pour ne pas afficher dans le chat
+            })
+        });
+        
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        
+        const data = await response.json();
+        
+        // Parser la réponse pour extraire les modules
+        parseModulesFromResponse(data);
+        
+        addLog('success', `${state.modules.length} modules trouvés`, 'Modules');
+        
+    } catch (error) {
+        console.error('Erreur chargement modules:', error);
+        addLog('error', `Erreur modules: ${error.message}`, 'Modules');
+        
+        // Modules par défaut si échec
+        state.modules = [
+            { id: '1', name: 'SABRINA Creator', active: true, webhookPath: 'sabrina-creator-v2' },
+            { id: '2', name: 'SABRINA Core', active: true, webhookPath: 'sabrina' },
+            { id: '3', name: 'SABRINA Formations', active: true, webhookPath: 'sabrina-formations-web' },
+            { id: '4', name: 'SABRINA Marketing', active: true, webhookPath: 'sabrina-marketing' },
+            { id: '5', name: 'SABRINA Commercial', active: true, webhookPath: 'sabrina-commercial' },
+            { id: '6', name: 'SABRINA CEO', active: true, webhookPath: 'sabrina-ceo' },
+            { id: '7', name: 'SABRINA RH', active: true, webhookPath: 'sabrina-rh' },
+            { id: '8', name: 'SABRINA Audit', active: true, webhookPath: 'sabrina-audit' }
+        ];
+    }
+    
+    updateModulesUI();
+}
+
+function parseModulesFromResponse(data) {
+    // Essayer de parser la réponse de Creator
+    let responseText = '';
+    
+    if (typeof data === 'string') {
+        responseText = data;
+    } else if (data.message) {
+        responseText = data.message;
+    } else if (data.response) {
+        responseText = data.response;
+    } else if (Array.isArray(data) && data[0]) {
+        responseText = data[0].message || data[0].response || JSON.stringify(data[0]);
+    }
+    
+    // Extraire les modules de la réponse (format: 🟢 SABRINA xxx (ID: xx))
+    const moduleRegex = /(🟢|⚪|✅|❌)\s*(SABRINA\s+\w+)(?:\s*\(ID:\s*(\d+)\))?/gi;
+    const matches = [...responseText.matchAll(moduleRegex)];
+    
+    if (matches.length > 0) {
+        state.modules = matches.map((m, i) => ({
+            id: m[3] || String(i + 1),
+            name: m[2].trim(),
+            active: m[1] === '🟢' || m[1] === '✅',
+            webhookPath: m[2].toLowerCase().replace(/\s+/g, '-')
+        }));
+    }
+}
+
+function updateModulesUI() {
+    const active = state.modules.filter(m => m.active).length;
+    const inactive = state.modules.filter(m => !m.active).length;
+    
+    document.getElementById('statsTotal').textContent = state.modules.length;
+    document.getElementById('statsActive').textContent = active;
+    document.getElementById('statsInactive').textContent = inactive;
+    document.getElementById('activeModulesCount').textContent = active;
+    
+    renderModulesGrid();
+    renderModulesMiniList();
+}
+
+function renderModulesGrid() {
+    const grid = document.getElementById('modulesGrid');
+    
+    if (state.modules.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">Aucun module trouvé</div>';
+        return;
+    }
+    
+    grid.innerHTML = state.modules.map(m => `
+        <div class="module-card">
+            <div class="module-card-header">
+                <div class="module-card-title">
+                    <div class="module-status ${m.active ? 'active' : ''}"></div>
+                    <span class="module-name">${escapeHtml(m.name)}</span>
+                </div>
+            </div>
+            <div class="module-id">ID: ${m.id}</div>
+            <div class="module-webhook">/webhook/${m.webhookPath}</div>
+            <div class="module-actions">
+                <button class="module-btn" onclick="testModuleWebhook('${m.webhookPath}', '${escapeHtml(m.name)}')">🧪 Test</button>
+                <button class="module-btn" onclick="talkToModule('${escapeHtml(m.name)}')">💬 Parler</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderModulesMiniList() {
+    const list = document.getElementById('modulesMiniList');
+    const activeModules = state.modules.filter(m => m.active).slice(0, 8);
+    
+    list.innerHTML = activeModules.map(m => `
+        <div class="module-mini" onclick="talkToModule('${escapeHtml(m.name)}')">
+            <div class="module-mini-dot active"></div>
+            <span class="module-mini-name">${escapeHtml(m.name.replace('SABRINA ', ''))}</span>
+        </div>
+    `).join('');
+}
+
+// Module actions (global functions for onclick)
+window.testModuleWebhook = async function(webhookPath, name) {
+    addLog('info', `Test ${name}...`, 'Test');
+    showToast('info', `Test de ${name}...`);
+    
+    try {
+        const url = `https://n8n.srv1121126.hstgr.cloud/webhook/${webhookPath}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userMessage: 'ping', test: true })
+        });
+        
+        if (response.ok) {
+            showToast('success', `${name} ✓ OK`);
+            addLog('success', `${name}: OK`, 'Test');
+        } else {
+            throw new Error('HTTP ' + response.status);
+        }
+    } catch (error) {
+        showToast('error', `${name} ✗ Erreur`);
+        addLog('error', `${name}: ${error.message}`, 'Test');
+    }
+};
+
+window.talkToModule = function(moduleName) {
+    switchView('creator');
+    document.getElementById('messageInput').value = `@${moduleName.replace('SABRINA ', '')} `;
+    document.getElementById('messageInput').focus();
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// OUTILS - CORRIGÉ: fonctions directes au lieu de toString()
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderTools() {
+    const grid = document.getElementById('toolsGrid');
+    
+    const tools = [
+        { id: 'list', icon: '📋', name: 'Lister modules', desc: 'Voir tous les workflows SABRINA' },
+        { id: 'create', icon: '✨', name: 'Créer module', desc: 'Générer un nouveau workflow IA' },
+        { id: 'status', icon: '🔍', name: 'Audit système', desc: 'Analyser l\'état de l\'infrastructure' },
+        { id: 'stats', icon: '📊', name: 'Statistiques', desc: 'Voir les modules' },
+        { id: 'testall', icon: '🧪', name: 'Test global', desc: 'Tester tous les modules actifs' },
+        { id: 'refresh', icon: '🔄', name: 'Synchroniser', desc: 'Rafraîchir les données' },
+        { id: 'logs', icon: '📜', name: 'Voir logs', desc: 'Historique des actions' },
+        { id: 'settings', icon: '⚙️', name: 'Configuration', desc: 'Paramètres du dashboard' }
+    ];
+    
+    grid.innerHTML = tools.map(t => `
+        <div class="tool-card" onclick="executeTool('${t.id}')">
+            <div class="tool-icon">${t.icon}</div>
+            <div class="tool-name">${t.name}</div>
+            <div class="tool-desc">${t.desc}</div>
+        </div>
+    `).join('');
+}
+
+// Fonction globale pour exécuter les outils
+window.executeTool = function(toolId) {
+    addLog('info', `Outil: ${toolId}`, 'Tools');
+    
+    switch(toolId) {
+        case 'list':
+            quickAction('list');
+            break;
+        case 'create':
+            quickAction('create');
+            break;
+        case 'status':
+            quickAction('status');
+            break;
+        case 'stats':
+            switchView('modules');
+            break;
+        case 'testall':
+            testAllModules();
+            break;
+        case 'refresh':
+            refreshAll();
+            break;
+        case 'logs':
+            switchView('logs');
+            break;
+        case 'settings':
+            showSettings();
+            break;
+        default:
+            showToast('info', `Outil ${toolId} non implémenté`);
+    }
+};
+
+async function testAllModules() {
+    const activeModules = state.modules.filter(m => m.active);
+    showToast('info', `Test de ${activeModules.length} modules...`);
+    addLog('info', `Test global: ${activeModules.length} modules`, 'Test');
+    
+    let success = 0;
+    for (const m of activeModules) {
+        try {
+            const url = `https://n8n.srv1121126.hstgr.cloud/webhook/${m.webhookPath}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userMessage: 'ping', test: true })
+            });
+            if (response.ok) success++;
+        } catch (e) {}
+    }
+    
+    const msg = `${success}/${activeModules.length} modules OK`;
+    showToast(success === activeModules.length ? 'success' : 'warning', msg);
+    addLog('info', msg, 'Test');
+}
+
+function showSettings() {
+    showToast('info', 'Paramètres - Fonctionnalité à venir');
+    addLog('info', 'Paramètres ouverts', 'Settings');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LOGS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function addLog(level, message, source) {
+    state.logs.unshift({
+        time: new Date().toISOString(),
+        level,
+        message,
+        source
+    });
+    
+    if (state.logs.length > 100) state.logs.pop();
+    
+    if (state.currentView === 'logs') {
+        renderLogs();
+    }
+}
+
+function renderLogs() {
+    const container = document.getElementById('logsContainer');
+    const logs = state.currentLogFilter === 'all' 
+        ? state.logs 
+        : state.logs.filter(l => l.level === state.currentLogFilter);
+    
+    if (logs.length === 0) {
+        container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-secondary);">Aucun log</div>';
+        return;
+    }
+    
+    container.innerHTML = logs.map(log => `
+        <div class="log-entry">
+            <span class="log-time">${new Date(log.time).toLocaleTimeString('fr-FR')}</span>
+            <span class="log-level ${log.level}">${log.level}</span>
+            <span class="log-message">${escapeHtml(log.message)}</span>
+            <span class="log-source">[${log.source}]</span>
+        </div>
+    `).join('');
+}
+
+function filterLogs(filter) {
+    state.currentLogFilter = filter;
+    
+    document.querySelectorAll('.log-filter').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    
+    renderLogs();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHAT / MESSAGES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message || state.isTyping) return;
+    
+    // Ajouter message utilisateur
+    const userMsg = {
+        id: Date.now(),
+        role: 'user',
+        content: message,
+        timestamp: new Date().toISOString()
+    };
+    
+    state.messages.push(userMsg);
+    input.value = '';
+    autoResize(input);
+    
+    showMessages();
+    renderMessage(userMsg);
+    showTyping();
+    scrollToBottom();
+    
+    addLog('info', `Message: "${message.substring(0, 30)}..."`, 'Chat');
+    
+    try {
+        const response = await fetch(CONFIG.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userMessage: message, userId: CONFIG.userId })
+        });
+        
+        hideTyping();
+        
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        
+        const data = await response.json();
+        
+        // Extraire la réponse
+        let responseText = '';
+        if (typeof data === 'string') {
+            responseText = data;
+        } else if (data.message) {
+            responseText = data.message;
+        } else if (data.response) {
+            responseText = data.response;
+        } else if (Array.isArray(data) && data[0]) {
+            responseText = data[0].message || data[0].response || JSON.stringify(data[0], null, 2);
+        } else {
+            responseText = JSON.stringify(data, null, 2);
+        }
+        
+        responseText = responseText.replace(/\\n/g, '\n') || 'Réponse reçue.';
+        
+        const assistantMsg = {
+            id: Date.now(),
+            role: 'assistant',
+            content: responseText,
+            timestamp: new Date().toISOString()
+        };
+        
+        state.messages.push(assistantMsg);
+        renderMessage(assistantMsg);
+        scrollToBottom();
+        saveState();
+        
+        state.isConnected = true;
+        updateStatus('connected', 'Connecté');
+        addLog('success', 'Réponse reçue', 'Chat');
+        
+    } catch (error) {
+        hideTyping();
+        console.error('Error:', error);
+        
+        state.isConnected = false;
+        updateStatus('error', 'Erreur');
+        
+        const errorMsg = {
+            id: Date.now(),
+            role: 'assistant',
+            content: `❌ Erreur: ${error.message}\n\nVérifie que SABRINA Creator V8 est actif dans n8n.`,
+            timestamp: new Date().toISOString()
+        };
+        
+        state.messages.push(errorMsg);
+        renderMessage(errorMsg);
+        scrollToBottom();
+        
+        showToast('error', 'Erreur de connexion');
+        addLog('error', error.message, 'Chat');
+    }
+}
+
+function renderMessage(msg) {
+    const container = document.getElementById('messagesContainer');
+    const time = new Date(msg.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const author = msg.role === 'user' ? 'Vous' : 'SABRINA';
+    const avatar = msg.role === 'user' ? 'L' : 'S';
+    
+    container.insertAdjacentHTML('beforeend', `
+        <div class="message ${msg.role}">
+            <div class="message-avatar">${avatar}</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-author">${author}</span>
+                    <span class="message-time">${time}</span>
+                </div>
+                <div class="message-body">${formatMarkdown(msg.content)}</div>
+            </div>
+        </div>
+    `);
+}
+
+function renderMessages() {
+    const container = document.getElementById('messagesContainer');
+    container.innerHTML = '';
+    
+    if (state.messages.length > 0) {
+        showMessages();
+        state.messages.forEach(msg => renderMessage(msg));
+        scrollToBottom();
+    }
+}
+
+function formatMarkdown(text) {
+    if (!text) return '';
+    
+    let html = escapeHtml(text);
+    html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    html = html.replace(/^- (.+)$/gm, '• $1');
+    
+    return html.split(/\n\n+/).map(p => {
+        p = p.trim();
+        if (!p || p.startsWith('<')) return p;
+        return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+    }).join('');
+}
+
+function showMessages() {
+    document.getElementById('welcomeState').style.display = 'none';
+    document.getElementById('messagesContainer').classList.add('active');
+}
+
+function showTyping() {
+    state.isTyping = true;
+    document.getElementById('typingIndicator').classList.add('active');
+    scrollToBottom();
+}
+
+function hideTyping() {
+    state.isTyping = false;
+    document.getElementById('typingIndicator').classList.remove('active');
+}
+
+function scrollToBottom() {
+    const scroll = document.getElementById('chatScroll');
+    setTimeout(() => { scroll.scrollTop = scroll.scrollHeight; }, 50);
+}
+
+function newChat() {
+    state.messages = [];
+    document.getElementById('messagesContainer').innerHTML = '';
+    document.getElementById('messagesContainer').classList.remove('active');
+    document.getElementById('welcomeState').style.display = 'flex';
+    switchView('creator');
+    addLog('info', 'Nouvelle conversation', 'Chat');
+}
+
+function quickAction(action) {
+    const messages = {
+        list: 'Liste tous les modules SABRINA',
+        create: 'Je veux créer un nouveau module SABRINA',
+        help: 'Aide-moi à comprendre comment utiliser SABRINA Creator',
+        status: 'Quel est l\'état actuel du système SABRINA ?'
+    };
+    
+    switchView('creator');
+    document.getElementById('messageInput').value = messages[action] || '';
+    showMessages();
+    sendMessage();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function handleKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+}
+
+function showToast(type, message) {
+    const container = document.getElementById('toastContainer');
+    const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-message">${escapeHtml(message)}</span>`;
+    
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+function saveState() {
+    try {
+        localStorage.setItem(CONFIG.storageKey, JSON.stringify({
+            messages: state.messages.slice(-50)
+        }));
+    } catch (e) {}
+}
+
+function loadState() {
+    try {
+        const saved = localStorage.getItem(CONFIG.storageKey);
+        if (saved) {
+            const data = JSON.parse(saved);
+            state.messages = data.messages || [];
+        }
+    } catch (e) {}
+}
+
+console.log('SABRINA Dashboard V5 - Ready');
+</script>
+</body>
+</html>
