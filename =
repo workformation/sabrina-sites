@@ -1,0 +1,1524 @@
+=<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dashboard SABRINA - Interface de gestion et monitoring">
+  <title>Dashboard | SABRINA</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  
+  <style>
+    /* Variables CSS */
+    :root {
+      /* Couleurs primaires */
+      --primary: #1E3A5F;
+      --primary-hover: #16304D;
+      --primary-light: #1E3A5F20;
+      --accent: #3B82F6;
+      --accent-hover: #2563EB;
+      
+      /* Backgrounds */
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-elevated: #ffffff;
+      --bg-overlay: rgba(0, 0, 0, 0.5);
+      
+      /* Textes */
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-tertiary: #94a3b8;
+      --text-inverse: #ffffff;
+      
+      /* Bordures */
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --border-focus: var(--primary);
+      
+      /* États */
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --error: #ef4444;
+      --error-light: #fee2e2;
+      --info: #3b82f6;
+      --info-light: #dbeafe;
+      
+      /* Ombres */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      
+      /* Rayons */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-full: 9999px;
+      
+      /* Transitions */
+      --transition-fast: 150ms ease;
+      --transition-base: 200ms ease;
+      --transition-slow: 300ms ease;
+      
+      /* Typographie */
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Dark Mode */
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --bg-elevated: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --border-light: #334155;
+      --border-medium: #475569;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Layout */
+    .dashboard {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: var(--bg-elevated);
+      border-right: 1px solid var(--border-light);
+      transition: transform var(--transition-base);
+      z-index: 1000;
+    }
+
+    .sidebar.collapsed {
+      width: 80px;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      height: 70px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .content {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    /* Sidebar Components */
+    .sidebar-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .sidebar-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+
+    .sidebar-title {
+      font-weight: 600;
+      font-size: 1.125rem;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidebar.collapsed .sidebar-title {
+      opacity: 0;
+    }
+
+    .sidebar-nav {
+      padding: 1rem 0;
+    }
+
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0 1.25rem;
+      margin-bottom: 0.5rem;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidebar.collapsed .nav-section-title {
+      opacity: 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--primary);
+    }
+
+    .nav-item i {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item-text {
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidebar.collapsed .nav-item-text {
+      opacity: 0;
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      bottom: 1rem;
+      left: 1.25rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--bg-secondary);
+    }
+
+    /* Header Components */
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .search-box {
+      position: relative;
+      width: 300px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+      font-size: 0.875rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      transition: all var(--transition-fast);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-btn {
+      position: relative;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    }
+
+    .header-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background: var(--error);
+      border-radius: 50%;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .user-menu:hover {
+      background: var(--bg-secondary);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .user-name {
+      font-weight: 500;
+      font-size: 0.875rem;
+      line-height: 1;
+    }
+
+    .user-role {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      line-height: 1;
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+    }
+
+    .kpi-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .kpi-icon.primary { background: var(--primary); }
+    .kpi-icon.success { background: var(--success); }
+    .kpi-icon.warning { background: var(--warning); }
+    .kpi-icon.info { background: var(--info); }
+
+    .kpi-trend {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .kpi-trend.up { color: var(--success); }
+    .kpi-trend.down { color: var(--error); }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .kpi-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .kpi-footer {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+    }
+
+    /* Charts Section */
+    .charts-section {
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: between;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .chart-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chart-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .chart-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chart-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+    }
+
+    .chart-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .chart-body {
+      padding: 1.25rem;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-tertiary);
+      background: linear-gradient(135deg, var(--primary-light), var(--accent)20);
+    }
+
+    /* Data Table */
+    .table-section {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .table-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .data-table th {
+      background: var(--bg-secondary);
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .data-table td {
+      color: var(--text-primary);
+    }
+
+    .data-table tr:hover {
+      background: var(--bg-secondary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: var(--radius-full);
+    }
+
+    .status-badge.active {
+      background: var(--success-light);
+      color: #065f46;
+    }
+
+    .status-badge.pending {
+      background: var(--warning-light);
+      color: #92400e;
+    }
+
+    .status-badge.inactive {
+      background: var(--error-light);
+      color: #991b1b;
+    }
+
+    .table-pagination {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: between;
+    }
+
+    .pagination-info {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .pagination-btn {
+      background: none;
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+    }
+
+    .pagination-btn:hover {
+      background: var(--bg-secondary);
+      border-color: var(--border-medium);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Notifications */
+    .notifications {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .notification {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 300px;
+    }
+
+    .notification-success {
+      border-left: 4px solid var(--success);
+    }
+
+    .notification-error {
+      border-left: 4px solid var(--error);
+    }
+
+    .notification-info {
+      border-left: 4px solid var(--info);
+    }
+
+    .notification button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      margin-left: auto;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+    .animate-fadeInUp { animation: fadeInUp 0.4s ease-out; }
+    .animate-slideInRight { animation: slideInRight 0.4s ease-out; }
+    .animate-spin { animation: spin 1s linear infinite; }
+
+    /* Loading States */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border-light);
+      border-top: 2px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+        z-index: 1000;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .search-box {
+        display: none;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-left {
+        flex: 1;
+      }
+
+      .user-info {
+        display: none;
+      }
+
+      .content {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .data-table {
+        font-size: 0.875rem;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 0.5rem;
+      }
+
+      .table-actions {
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">S</div>
+        <h2 class="sidebar-title">SABRINA</h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Principal</div>
+          <a href="#" class="nav-item active">
+            <i data-lucide="layout-dashboard"></i>
+            <span class="nav-item-text">Dashboard</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i data-lucide="users"></i>
+            <span class="nav-item-text">Utilisateurs</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i data-lucide="message-circle"></i>
+            <span class="nav-item-text">Conversations</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i data-lucide="bar-chart-3"></i>
+            <span class="nav-item-text">Analytics</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Gestion</div>
+          <a href="#" class="nav-item">
+            <i data-lucide="settings"></i>
+            <span class="nav-item-text">Paramètres</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i data-lucide="shield"></i>
+            <span class="nav-item-text">Sécurité</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i data-lucide="database"></i>
+            <span class="nav-item-text">Base de données</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Support</div>
+          <a href="#" class="nav-item">
+            <i data-lucide="help-circle"></i>
+            <span class="nav-item-text">Aide</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i data-lucide="file-text"></i>
+            <span class="nav-item-text">Documentation</span>
+          </a>
+        </div>
+      </nav>
+
+      <button class="sidebar-toggle" id="sidebar-toggle">
+        <i data-lucide="chevron-left"></i>
+      </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+            <i data-lucide="menu"></i>
+          </button>
+          
+          <div class="search-box">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" class="search-input" placeholder="Rechercher...">
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="header-actions">
+            <button class="header-btn" id="refresh-btn" title="Actualiser">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+            
+            <button class="header-btn" title="Notifications">
+              <i data-lucide="bell"></i>
+              <span class="notification-badge"></span>
+            </button>
+            
+            <button class="header-btn" id="theme-toggle" title="Changer le thème">
+              <i data-lucide="moon"></i>
+            </button>
+          </div>
+
+          <div class="user-menu">
+            <div class="user-avatar">JD</div>
+            <div class="user-info">
+              <div class="user-name">John Doe</div>
+              <div class="user-role">Administrateur</div>
+            </div>
+            <i data-lucide="chevron-down"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card animate-fadeInUp">
+            <div class="kpi-header">
+              <div class="kpi-icon primary">
+                <i data-lucide="users"></i>
+              </div>
+              <div class="kpi-trend up">
+                <i data-lucide="trending-up"></i>
+                +12%
+              </div>
+            </div>
+            <div class="kpi-value">2,847</div>
+            <div class="kpi-label">Utilisateurs actifs</div>
+            <div class="kpi-footer">+127 ce mois</div>
+          </div>
+
+          <div class="kpi-card animate-fadeInUp" style="animation-delay: 0.1s">
+            <div class="kpi-header">
+              <div class="kpi-icon success">
+                <i data-lucide="message-circle"></i>
+              </div>
+              <div class="kpi-trend up">
+                <i data-lucide="trending-up"></i>
+                +8%
+              </div>
+            </div>
+            <div class="kpi-value">18,432</div>
+            <div class="kpi-label">Conversations</div>
+            <div class="kpi-footer">+1,234 cette semaine</div>
+          </div>
+
+          <div class="kpi-card animate-fadeInUp" style="animation-delay: 0.2s">
+            <div class="kpi-header">
+              <div class="kpi-icon warning">
+                <i data-lucide="clock"></i>
+              </div>
+              <div class="kpi-trend down">
+                <i data-lucide="trending-down"></i>
+                -3%
+              </div>
+            </div>
+            <div class="kpi-value">2.4s</div>
+            <div class="kpi-label">Temps de réponse</div>
+            <div class="kpi-footer">-0.1s ce mois</div>
+          </div>
+
+          <div class="kpi-card animate-fadeInUp" style="animation-delay: 0.3s">
+            <div class="kpi-header">
+              <div class="kpi-icon info">
+                <i data-lucide="activity"></i>
+              </div>
+              <div class="kpi-trend up">
+                <i data-lucide="trending-up"></i>
+                +15%
+              </div>
+            </div>
+            <div class="kpi-value">94.2%</div>
+            <div class="kpi-label">Satisfaction</div>
+            <div class="kpi-footer">+2.1% ce mois</div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+          <div class="section-header">
+            <h2 class="section-title">Analyses</h2>
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-card animate-fadeInUp">
+              <div class="chart-header">
+                <h3 class="chart-title">Évolution des conversations</h3>
+                <div class="chart-actions">
+                  <button class="chart-btn" title="Paramètres">
+                    <i data-lucide="settings"></i>
+                  </button>
+                  <button class="chart-btn" title="Plein écran">
+                    <i data-lucide="maximize"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="chart-body">
+                <div style="text-align: center;">
+                  <i data-lucide="bar-chart-3" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                  <p>Graphique des conversations sur 30 jours</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-card animate-fadeInUp" style="animation-delay: 0.1s">
+              <div class="chart-header">
+                <h3 class="chart-title">Répartition par canal</h3>
+                <div class="chart-actions">
+                  <button class="chart-btn" title="Paramètres">
+                    <i data-lucide="settings"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="chart-body">
+                <div style="text-align: center;">
+                  <i data-lucide="pie-chart" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                  <p>Distribution par canaux de communication</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Data Table -->
+        <section class="table-section animate-fadeInUp">
+          <div class="table-header">
+            <h2 class="table-title">Activité récente</h2>
+            <div class="table-actions">
+              <button class="btn btn-secondary">
+                <i data-lucide="filter"></i>
+                Filtrer
+              </button>
+              <button class="btn btn-primary">
+                <i data-lucide="plus"></i>
+                Nouveau
+              </button>
+            </div>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Utilisateur</th>
+                <th>Action</th>
+                <th>Canal</th>
+                <th>Statut</th>
+                <th>Horodatage</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 32px; height: 32px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 600;">MA</div>
+                    <div>
+                      <div style="font-weight: 500;">Marie Dubois</div>
+                      <div style="font-size: 0.75rem; color: var(--text-tertiary);">marie@exemple.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Nouvelle conversation</td>
+                <td>WhatsApp</td>
+                <td><span class="status-badge active">Actif</span></td>
+                <td>Il y a 2 min</td>
+                <td>
+                  <button class="chart-btn" title="Voir détails">
+                    <i data-lucide="eye"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 32px; height: 32px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 600;">PL</div>
+                    <div>
+                      <div style="font-weight: 500;">Pierre Lefebvre</div>
+                      <div style="font-size: 0.75rem; color: var(--text-tertiary);">pierre@exemple.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Message envoyé</td>
+                <td>Email</td>
+                <td><span class="status-badge pending">En attente</span></td>
+                <td>Il y a 5 min</td>
+                <td>
+                  <button class="chart-btn" title="Voir détails">
+                    <i data-lucide="eye"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 32px; height: 32px; background: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 600;">SM</div>
+                    <div>
+                      <div style="font-weight: 500;">Sophie Martin</div>
+                      <div style="font-size: 0.75rem; color: var(--text-tertiary);">sophie@exemple.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Connexion</td>
+                <td>Web</td>
+                <td><span class="status-badge active">Actif</span></td>
+                <td>Il y a 12 min</td>
+                <td>
+                  <button class="chart-btn" title="Voir détails">
+                    <i data-lucide="eye"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 32px; height: 32px; background: var(--error); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 600;">JR</div>
+                    <div>
+                      <div style="font-weight: 500;">Jean Rousseau</div>
+                      <div style="font-size: 0.75rem; color: var(--text-tertiary);">jean@exemple.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Déconnexion</td>
+                <td>Mobile</td>
+                <td><span class="status-badge inactive">Inactif</span></td>
+                <td>Il y a 1h</td>
+                <td>
+                  <button class="chart-btn" title="Voir détails">
+                    <i data-lucide="eye"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 600;">AB</div>
+                    <div>
+                      <div style="font-weight: 500;">Alice Bernard</div>
+                      <div style="font-size: 0.75rem; color: var(--text-tertiary);">alice@exemple.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Paramètres modifiés</td>
+                <td>Web</td>
+                <td><span class="status-badge active">Actif</span></td>
+                <td>Il y a 2h</td>
+                <td>
+                  <button class="chart-btn" title="Voir détails">
+                    <i data-lucide="eye"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="table-pagination">
+            <div class="pagination-info">
+              Affichage de 1 à 5 sur 247 entrées
+            </div>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <button class="pagination-btn">1</button>
+              <button class="pagination-btn">2</button>
+              <button class="pagination-btn">3</button>
+              <button class="pagination-btn">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // State Management
+    const state = {
+      theme: localStorage.getItem('theme') || 'light',
+      loading: false,
+      sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+      sidebarOpen: false
+    };
+
+    // DOM Helpers
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
+
+    // Theme Management
+    function initTheme() {
+      document.documentElement.setAttribute('data-theme', state.theme);
+      updateThemeIcon();
+    }
+
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      localStorage.setItem('theme', state.theme);
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      const icon = $('#theme-toggle i');
+      if (icon) {
+        icon.setAttribute('data-lucide', state.theme === 'dark' ? 'sun' : 'moon');
+        lucide.createIcons();
+      }
+    }
+
+    // Sidebar Management
+    function initSidebar() {
+      const sidebar = $('#sidebar');
+      if (state.sidebarCollapsed) {
+        sidebar.classList.add('collapsed');
+        updateSidebarIcon();
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = $('#sidebar');
+      state.sidebarCollapsed = !state.sidebarCollapsed;
+      
+      if (state.sidebarCollapsed) {
+        sidebar.classList.add('collapsed');
+      } else {
+        sidebar.classList.remove('collapsed');
+      }
+      
+      localStorage.setItem('sidebarCollapsed', state.sidebarCollapsed);
+      updateSidebarIcon();
+    }
+
+    function updateSidebarIcon() {
+      const icon = $('#sidebar-toggle i');
+      if (icon) {
+        icon.setAttribute('data-lucide', state.sidebarCollapsed ? 'chevron-right' : 'chevron-left');
+        lucide.createIcons();
+      }
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = $('#sidebar');
+      state.sidebarOpen = !state.sidebarOpen;
+      
+      if (state.sidebarOpen) {
+        sidebar.classList.add('open');
+      } else {
+        sidebar.classList.remove('open');
+      }
+    }
+
+    // Webhook Configuration
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+
+    async function sendToSabrina(message, data = {}) {
+      state.loading = true;
+      updateLoadingState();
+      
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userMessage: message,
+            timestamp: new Date().toISOString(),
+            source: 'dashboard',
+            ...data
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const result = await response.json();
+        showNotification('Données envoyées avec succès', 'success');
+        return result;
+        
+      } catch (error) {
+        console.error('Erreur webhook:', error);
+        showNotification('Erreur de connexion à SABRINA', 'error');
+        return { error: true, message: error.message };
+        
+      } finally {
+        state.loading = false;
+        updateLoadingState();
+      }
+    }
+
+    // Loading State Management
+    function updateLoadingState() {
+      const refreshBtn = $('#refresh-btn');
+      const refreshIcon = refreshBtn?.querySelector('i');
+      
+      if (state.loading) {
+        refreshBtn?.classList.add('loading');
+        if (refreshIcon) {
+          refreshIcon.classList.add('animate-spin');
+        }
+      } else {
+        refreshBtn?.classList.remove('loading');
+        if (refreshIcon) {
+          refreshIcon.classList.remove('animate-spin');
+        }
+      }
+    }
+
+    // Data Refresh
+    async function refreshDashboard() {
+      if (state.loading) return;
+      
+      await sendToSabrina('Actualisation du dashboard', {
+        action: 'refresh_dashboard',
+        timestamp: new Date().toISOString()
+      });
+      
+      // Simulate data refresh
+      setTimeout(() => {
+        showNotification('Dashboard actualisé', 'success');
+      }, 1000);
+    }
+
+    // Notifications System
+    function showNotification(message, type = 'info') {
+      const container = $('#notifications') || createNotificationContainer();
+      
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type} animate-slideInRight`;
+      notification.innerHTML = `
+        <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'}"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()"><i data-lucide="x"></i></button>
+      `;
+      
+      container.appendChild(notification);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.remove();
+        }
+      }, 4000);
+    }
+
+    function createNotificationContainer() {
+      const container = document.createElement('div');
+      container.id = 'notifications';
+      container.className = 'notifications';
+      document.body.appendChild(container);
+      return container;
+    }
+
+    // Search Functionality
+    function initSearch() {
+      const searchInput = $('.search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', debounce((e) => {
+          const query = e.target.value.trim();
+          if (query.length > 2) {
+            performSearch(query);
+          }
+        }, 300));
+      }
+    }
+
+    async function performSearch(query) {
+      await sendToSabrina(`Recherche: ${query}`, {
+        action: 'search',
+        query: query
+      });
+    }
+
+    // Utility Functions
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Event Handlers
+    function initEventHandlers() {
+      // Theme toggle
+      $('#theme-toggle')?.addEventListener('click', toggleTheme);
+      
+      // Sidebar toggle
+      $('#sidebar-toggle')?.addEventListener('click', toggleSidebar);
+      $('#mobile-menu-toggle')?.addEventListener('click', toggleMobileSidebar);
+      
+      // Refresh button
+      $('#refresh-btn')?.addEventListener('click', refreshDashboard);
+      
+      // Close mobile sidebar when clicking outside
+      document.addEventListener('click', (e) => {
+        const sidebar = $('#sidebar');
+        const mobileToggle = $('#mobile-menu-toggle');
+        
+        if (state.sidebarOpen && 
+            !sidebar.contains(e.target) && 
+            !mobileToggle.contains(e.target)) {
+          toggleMobileSidebar();
+        }
+      });
+      
+      // Navigation items
+      $$('.nav-item').forEach(item => {
+        item.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const text = item.querySelector('.nav-item-text')?.textContent || 'Navigation';
+          
+          // Update active state
+          $$('.nav-item').forEach(nav => nav.classList.remove('active'));
+          item.classList.add('active');
+          
+          await sendToSabrina(`Navigation vers: ${text}`, {
+            action: 'navigate',
+            destination: text
+          });
+        });
+      });
+      
+      // Table actions
+      $$('.chart-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const title = btn.getAttribute('title') || 'Action';
+          await sendToSabrina(`Action: ${title}`, {
+            action: 'table_action',
+            type: title
+          });
+        });
+      });
+    }
+
+    // App Initialization
+    function initApp() {
+      initTheme();
+      initSidebar();
+      initSearch();
+      initEventHandlers();
+      
+      // Send initial dashboard load event
+      setTimeout(() => {
+        sendToSabrina('Dashboard chargé', {
+          action: 'dashboard_loaded',
+          userAgent: navigator.userAgent,
+          viewport: {
+            width: window.innerWidth,
+            height: window.innerHeight
+          }
+        });
+      }, 1000);
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initApp();
+    });
+
+    // Handle window resize for responsive behavior
+    window.addEventListener('resize', debounce(() => {
+      if (window.innerWidth > 768 && state.sidebarOpen) {
+        toggleMobileSidebar();
+      }
+    }, 250));
+  </script>
+</body>
+</html>
