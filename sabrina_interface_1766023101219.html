@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SABRINA Chat Interface | Conversation IA</title>
+  
+  <!-- Fonts Premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  
+  <style>
+    /* Variables CSS Premium */
+    :root {
+      --primary: #1E3A5F;
+      --accent: #3B82F6;
+      --bg: #0A0F1A;
+      --surface: #1A1F2E;
+      --surface-light: #252B3A;
+      --text: #FFFFFF;
+      --text-muted: #94A3B8;
+      --border: rgba(255, 255, 255, 0.1);
+      --glow: rgba(59, 130, 246, 0.3);
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+    }
+
+    [data-theme="light"] {
+      --primary: #1E3A5F;
+      --accent: #3B82F6;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-light: #F1F5F9;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --border: rgba(15, 23, 42, 0.1);
+      --glow: rgba(59, 130, 246, 0.2);
+    }
+
+    /* Reset Moderne */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Layout System */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    /* Header Premium */
+    .chat-header {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .sabrina-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1.2rem;
+      position: relative;
+      animation: pulse 3s infinite;
+    }
+
+    .sabrina-avatar::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 2px solid var(--surface);
+      animation: statusPulse 2s infinite;
+    }
+
+    .header-info h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .header-info p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .control-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border);
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .theme-toggle {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-toggle::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .theme-toggle:hover::before {
+      left: 100%;
+    }
+
+    /* Messages Container */
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      background: var(--bg);
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
+    }
+
+    .messages-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .messages-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    /* Message Styles */
+    .message {
+      display: flex;
+      gap: 1rem;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .message.sabrina .message-avatar {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+    }
+
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, var(--accent), #8B5CF6);
+      color: white;
+    }
+
+    .message-content {
+      flex: 1;
+      max-width: 70%;
+    }
+
+    .message-bubble {
+      padding: 1rem 1.25rem;
+      border-radius: 20px;
+      position: relative;
+      word-wrap: break-word;
+    }
+
+    .message.sabrina .message-bubble {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 8px;
+    }
+
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, var(--accent), #6366F1);
+      color: white;
+      border-bottom-right-radius: 8px;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      text-align: right;
+    }
+
+    .message.sabrina .message-time {
+      text-align: left;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .typing-indicator.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .typing-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      border-bottom-left-radius: 8px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: typingDot 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    /* Input Bar */
+    .input-bar {
+      padding: 1.5rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      position: sticky;
+      bottom: 0;
+    }
+
+    .input-container {
+      display: flex;
+      gap: 1rem;
+      align-items: end;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .input-container:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+
+    .message-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 1rem;
+      resize: none;
+      max-height: 120px;
+      min-height: 24px;
+      font-family: inherit;
+    }
+
+    .message-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .input-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .action-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, var(--accent), #6366F1);
+      color: white;
+      border: none;
+    }
+
+    .send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px var(--glow);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .send-btn.loading {
+      animation: pulse 1s infinite;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-chip {
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.875rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .quick-chip:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Welcome Message */
+    .welcome-message {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .welcome-message h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--text);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border-color: var(--accent);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes statusPulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.6;
+        transform: scale(0.8);
+      }
+    }
+
+    @keyframes typingDot {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+      30% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .chat-header {
+        padding: 1rem;
+      }
+      
+      .header-info h1 {
+        font-size: 1.25rem;
+      }
+      
+      .messages-container {
+        padding: 1rem;
+      }
+      
+      .message-content {
+        max-width: 85%;
+      }
+      
+      .input-bar {
+        padding: 1rem;
+      }
+      
+      .welcome-features {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Loading States */
+    .loading {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="header-left">
+        <div class="sabrina-avatar">
+          S
+        </div>
+        <div class="header-info">
+          <h1>SABRINA</h1>
+          <p>Assistant IA • En ligne</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <button class="control-btn theme-toggle" id="themeToggle" title="Changer de thème">
+          <i data-lucide="sun" class="theme-icon"></i>
+        </button>
+        <button class="control-btn" title="Paramètres">
+          <i data-lucide="settings"></i>
+        </button>
+        <button class="control-btn" title="Plus d'options">
+          <i data-lucide="more-horizontal"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Messages Container -->
+    <div class="messages-container" id="messagesContainer">
+      <div class="welcome-message">
+        <h2>Bonjour ! Je suis SABRINA</h2>
+        <p>Votre assistant IA personnel, prêt à vous aider dans tous vos projets.</p>
+        
+        <div class="welcome-features">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="brain"></i>
+            </div>
+            <h3>Intelligence Avancée</h3>
+            <p>Analyse et compréhension contextuelle</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="zap"></i>
+            </div>
+            <h3>Réponses Rapides</h3>
+            <p>Traitement instantané de vos demandes</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="shield-check"></i>
+            </div>
+            <h3>Sécurisé</h3>
+            <p>Vos conversations restent privées</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-avatar">S</div>
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="input-bar">
+      <div class="quick-actions">
+        <div class="quick-chip" data-message="Aide-moi à créer un site web">🌐 Site web</div>
+        <div class="quick-chip" data-message="Explique-moi ce concept">💡 Explication</div>
+        <div class="quick-chip" data-message="Aide-moi à rédiger un email">✉️ Email</div>
+        <div class="quick-chip" data-message="Crée-moi un plan de projet">📋 Planning</div>
+      </div>
+      
+      <div class="input-container">
+        <textarea 
+          class="message-input" 
+          id="messageInput"
+          placeholder="Tapez votre message..."
+          rows="1"
+        ></textarea>
+        <div class="input-actions">
+          <button class="action-btn" title="Joindre un fichier">
+            <i data-lucide="paperclip"></i>
+          </button>
+          <button class="action-btn" title="Enregistrer un vocal">
+            <i data-lucide="mic"></i>
+          </button>
+          <button class="action-btn send-btn" id="sendBtn" title="Envoyer">
+            <i data-lucide="send"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State Management
+    const state = {
+      messages: [],
+      isTyping: false,
+      theme: localStorage.getItem('theme') || 'dark'
+    };
+
+    // Constants
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+    
+    // DOM Elements
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const themeToggle = document.getElementById('themeToggle');
+    const quickChips = document.querySelectorAll('.quick-chip');
+
+    // Theme Management
+    function initTheme() {
+      document.documentElement.setAttribute('data-theme', state.theme);
+      updateThemeIcon();
+    }
+
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', state.theme);
+      document.documentElement.setAttribute('data-theme', state.theme);
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      const icon = themeToggle.querySelector('.theme-icon');
+      icon.setAttribute('data-lucide', state.theme === 'dark' ? 'sun' : 'moon');
+      lucide.createIcons();
+    }
+
+    // Message Management
+    function createMessage(content, sender = 'user', timestamp = new Date()) {
+      const message = {
+        id: Date.now() + Math.random(),
+        content,
+        sender,
+        timestamp
+      };
+      state.messages.push(message);
+      return message;
+    }
+
+    function renderMessage(message) {
+      const messageEl = document.createElement('div');
+      messageEl.className = `message ${message.sender}`;
+      messageEl.style.animationDelay = '0.1s';
+      
+      const time = message.timestamp.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      messageEl.innerHTML = `
+        <div class="message-avatar">
+          ${message.sender === 'sabrina' ? 'S' : 'U'}
+        </div>
+        <div class="message-content">
+          <div class="message-bubble">
+            ${message.content}
+          </div>
+          <div class="message-time">${time}</div>
+        </div>
+      `;
+
+      // Remove welcome message if it exists
+      const welcomeMsg = messagesContainer.querySelector('.welcome-message');
+      if (welcomeMsg && state.messages.length === 1) {
+        welcomeMsg.remove();
+      }
+
+      messagesContainer.appendChild(messageEl);
+      scrollToBottom();
+
+      // Animate message appearance
+      setTimeout(() => {
+        messageEl.style.opacity = '1';
+      }, 100);
+    }
+
+    function showTyping() {
+      state.isTyping = true;
+      typingIndicator.classList.add('active');
+      scrollToBottom();
+    }
+
+    function hideTyping() {
+      state.isTyping = false;
+      typingIndicator.classList.remove('active');
+    }
+
+    function scrollToBottom() {
+      setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 100);
+    }
+
+    // Webhook Integration
+    async function sendToSabrina(messageContent) {
+      const userMessage = createMessage(messageContent, 'user');
+      renderMessage(userMessage);
+      
+      showTyping();
+      sendBtn.classList.add('loading');
+      
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userMessage: messageContent,
+            timestamp: new Date().toISOString(),
+            source: 'SABRINA_CHAT_INTERFACE',
+            userId: 'user_' + Date.now(),
+            sessionId: sessionStorage.getItem('sessionId') || 'session_' + Date.now()
+          })
+        });
+
+        if (!sessionStorage.getItem('sessionId')) {
+          sessionStorage.setItem('sessionId', 'session_' + Date.now());
+        }
+
+        // Simulate response delay for better UX
+        setTimeout(() => {
+          hideTyping();
+          
+          const responses = [
+            "Je comprends votre demande. Laissez-moi analyser cela et vous proposer une solution adaptée.",
+            "Excellente question ! Je vais vous aider avec plaisir. Voici ce que je peux vous proposer...",
+            "C'est un sujet intéressant. Permettez-moi de vous donner une réponse détaillée et précise.",
+            "Je vais traiter votre demande avec attention. Voici ma recommandation basée sur votre contexte...",
+            "Parfait ! Je peux définitivement vous aider avec cela. Voici une approche structurée..."
+          ];
+          
+          const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+          const sabinaMessage = createMessage(randomResponse, 'sabrina');
+          renderMessage(sabinaMessage);
+          
+          sendBtn.classList.remove('loading');
+        }, 1500 + Math.random() * 1000);
+
+      } catch (error) {
+        console.error('Erreur webhook:', error);
+        hideTyping();
+        
+        const errorMessage = createMessage(
+          "Désolée, je rencontre un problème de connexion. Pouvez-vous réessayer dans un moment ?", 
+          'sabrina'
+        );
+        renderMessage(errorMessage);
+        
+        sendBtn.classList.remove('loading');
+      }
+    }
+
+    // Input Management
+    function handleSendMessage() {
+      const content = messageInput.value.trim();
+      if (!content || state.isTyping) return;
+
+      sendToSabrina(content);
+      messageInput.value = '';
+      adjustTextareaHeight();
+    }
+
+    function adjustTextareaHeight() {
+      messageInput.style.height = 'auto';
+      messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+    }
+
+    // Event Listeners
+    themeToggle.addEventListener('click', toggleTheme);
+
+    sendBtn.addEventListener('click', handleSendMessage);
+
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    });
+
+    messageInput.addEventListener('input', adjustTextareaHeight);
+
+    quickChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const message = chip.dataset.message;
+        messageInput.value = message;
+        adjustTextareaHeight();
+        messageInput.focus();
+      });
+    });
+
+    // Auto-scroll on new messages
+    const observer = new MutationObserver(() => {
+      if (state.messages.length > 0) {
+        scrollToBottom();
+      }
+    });
+
+    observer.observe(messagesContainer, {
+      childList: true,
+      subtree: true
+    });
+
+    // Initialize
+    function init() {
+      initTheme();
+      lucide.createIcons();
+      messageInput.focus();
+      
+      // Add some sample messages for demo
+      setTimeout(() => {
+        if (state.messages.length === 0) {
+          // Auto-remove welcome after a moment to show the interface in action
+        }
+      }, 3000);
+    }
+
+    // Start the application
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
