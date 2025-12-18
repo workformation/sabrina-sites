@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SABRINA Chat Interface | Intelligence Conversationnelle</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #1E3A5F;
+      --accent: #3B82F6;
+      --bg: #0A0F1C;
+      --surface: #111827;
+      --surface-light: #1F2937;
+      --text: #F9FAFB;
+      --text-muted: #9CA3AF;
+      --border: rgba(59, 130, 246, 0.2);
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="light"] {
+      --bg: #FFFFFF;
+      --surface: #F8FAFC;
+      --surface-light: #F1F5F9;
+      --text: #1E293B;
+      --text-muted: #64748B;
+      --border: rgba(30, 58, 95, 0.2);
+      --glass: rgba(30, 58, 95, 0.05);
+      --glass-border: rgba(30, 58, 95, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .chat-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* HEADER */
+    .chat-header {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: fadeInDown 0.6s ease;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .avatar-container {
+      position: relative;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+      animation: pulse 3s infinite;
+    }
+
+    .status-indicator {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      animation: statusPulse 2s infinite;
+    }
+
+    .user-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .user-info p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-muted);
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .options-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-muted);
+    }
+
+    .options-btn:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    /* MESSAGES CONTAINER */
+    .messages-container {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      background: linear-gradient(135deg, var(--bg) 0%, rgba(30, 58, 95, 0.02) 100%);
+      position: relative;
+    }
+
+    .messages-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .messages-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    .message {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
+
+    .message.assistant .message-avatar {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+    }
+
+    .message.user .message-avatar {
+      background: var(--surface);
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+
+    .message-content {
+      flex: 1;
+      max-width: 70%;
+    }
+
+    .message-bubble {
+      padding: 1rem 1.5rem;
+      border-radius: 1.5rem;
+      position: relative;
+      word-wrap: break-word;
+      transition: all 0.3s ease;
+    }
+
+    .message.assistant .message-bubble {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-bottom-left-radius: 0.5rem;
+    }
+
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border-bottom-right-radius: 0.5rem;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      text-align: right;
+    }
+
+    .message.assistant .message-time {
+      text-align: left;
+    }
+
+    /* TYPING INDICATOR */
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    .typing-indicator.show {
+      display: flex;
+    }
+
+    .typing-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .typing-bubble {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      padding: 1rem 1.5rem;
+      border-radius: 1.5rem;
+      border-bottom-left-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: typingDots 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    /* INPUT BAR */
+    .input-bar {
+      padding: 1.5rem 2rem;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--glass-border);
+      position: sticky;
+      bottom: 0;
+    }
+
+    .input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .message-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 1rem 1.5rem;
+      color: var(--text);
+      font-size: 1rem;
+      resize: none;
+      outline: none;
+      transition: all 0.3s ease;
+      min-height: 50px;
+      max-height: 120px;
+    }
+
+    .message-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .message-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .send-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    .send-btn:active {
+      transform: scale(0.95);
+    }
+
+    .send-btn.loading {
+      animation: rotate 1s linear infinite;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-action {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-muted);
+    }
+
+    .quick-action:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* WELCOME MESSAGE */
+    .welcome-message {
+      text-align: center;
+      padding: 4rem 2rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease 0.3s forwards;
+    }
+
+    .welcome-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-subtitle {
+      color: var(--text-muted);
+      font-size: 1.125rem;
+      max-width: 500px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+
+    .welcome-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: left;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 0.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .feature-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-description {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+      }
+      50% {
+        box-shadow: 0 4px 30px rgba(59, 130, 246, 0.5);
+      }
+    }
+
+    @keyframes statusPulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes typingDots {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+      30% {
+        transform: translateY(-8px);
+        opacity: 1;
+      }
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .chat-header {
+        padding: 1rem;
+      }
+
+      .messages-container {
+        padding: 1rem;
+      }
+
+      .input-bar {
+        padding: 1rem;
+      }
+
+      .message-content {
+        max-width: 85%;
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+      }
+
+      .welcome-features {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-actions {
+        justify-content: center;
+      }
+    }
+
+    /* LOADING STATES */
+    .loading-shimmer {
+      background: linear-gradient(90deg, 
+        var(--surface) 25%, 
+        var(--surface-light) 50%, 
+        var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    /* NOTIFICATION */
+    .notification {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      padding: 1rem 1.5rem;
+      color: var(--text);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      max-width: 300px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .notification.error {
+      border-left: 4px solid var(--error);
+    }
+
+    .notification.warning {
+      border-left: 4px solid var(--warning);
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- HEADER -->
+    <header class="chat-header">
+      <div class="header-left">
+        <div class="avatar-container">
+          <div class="avatar">
+            S
+          </div>
+          <div class="status-indicator"></div>
+        </div>
+        <div class="user-info">
+          <h3>SABRINA</h3>
+          <p>Intelligence Conversationnelle • En ligne</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <i data-lucide="sun" width="20" height="20"></i>
+        </button>
+        <button class="options-btn">
+          <i data-lucide="more-vertical" width="20" height="20"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- MESSAGES CONTAINER -->
+    <div class="messages-container" id="messagesContainer">
+      <div class="welcome-message">
+        <h1 class="welcome-title">Bonjour ! Je suis SABRINA</h1>
+        <p class="welcome-subtitle">Votre assistante conversationnelle intelligente, prête à vous accompagner dans tous vos projets avec créativité et expertise.</p>
+        
+        <div class="welcome-features">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="brain" width="20" height="20"></i>
+            </div>
+            <h4 class="feature-title">Intelligence Avancée</h4>
+            <p class="feature-description">Analyse contextuelle et réponses personnalisées selon vos besoins spécifiques.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="zap" width="20" height="20"></i>
+            </div>
+            <h4 class="feature-title">Réponses Instantanées</h4>
+            <p class="feature-description">Traitement ultra-rapide pour une expérience conversationnelle fluide.</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="shield-check" width="20" height="20"></i>
+            </div>
+            <h4 class="feature-title">Sécurisé & Privé</h4>
+            <p class="feature-description">Vos conversations sont protégées par un chiffrement de niveau entreprise.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TYPING INDICATOR -->
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-avatar">S</div>
+        <div class="typing-bubble">
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT BAR -->
+    <div class="input-bar">
+      <div class="quick-actions">
+        <button class="quick-action" onclick="insertQuickMessage('Peux-tu m\'aider avec...')">
+          <i data-lucide="help-circle" width="16" height="16"></i>
+          Aide
+        </button>
+        <button class="quick-action" onclick="insertQuickMessage('Explique-moi comment...')">
+          <i data-lucide="lightbulb" width="16" height="16"></i>
+          Explication
+        </button>
+        <button class="quick-action" onclick="insertQuickMessage('Créons ensemble...')">
+          <i data-lucide="plus-circle" width="16" height="16"></i>
+          Création
+        </button>
+        <button class="quick-action" onclick="insertQuickMessage('Analyse cette situation...')">
+          <i data-lucide="search" width="16" height="16"></i>
+          Analyse
+        </button>
+      </div>
+      
+      <div class="input-container">
+        <textarea 
+          class="message-input" 
+          id="messageInput" 
+          placeholder="Tapez votre message ici... (Shift + Entrée pour nouvelle ligne)"
+          rows="1"
+        ></textarea>
+        <button class="send-btn" onclick="sendMessage()">
+          <i data-lucide="send" width="20" height="20"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+    let messageCounter = 0;
+
+    // STATE MANAGEMENT
+    const state = {
+      theme: localStorage.getItem('theme') || 'dark',
+      isTyping: false,
+      messages: []
+    };
+
+    // THEME TOGGLE
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      localStorage.setItem('theme', state.theme);
+      
+      const icon = document.querySelector('.theme-toggle i');
+      icon.setAttribute('data-lucide', state.theme === 'dark' ? 'sun' : 'moon');
+      lucide.createIcons();
+    }
+
+    // WEBHOOK INTEGRATION
+    async function sendToSabrina(message, data = {}) {
+      const btn = document.querySelector('.send-btn');
+      showTyping();
+      
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            userMessage: message,
+            timestamp: new Date().toISOString(),
+            source: 'SABRINA_INTERFACE',
+            sessionId: `session_${Date.now()}`,
+            ...data
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        setTimeout(() => {
+          hideTyping();
+          addMessage('assistant', result.response || 'Message reçu avec succès !');
+          showNotification('Message envoyé !', 'success');
+        }, 1500);
+        
+        return result;
+      } catch (error) {
+        console.error('Erreur webhook:', error);
+        hideTyping();
+        addMessage('assistant', 'Désolée, je rencontre un problème de connexion. Pouvez-vous réessayer ?');
+        showNotification('Erreur de connexion', 'error');
+        return { error: true };
+      }
+    }
+
+    // MESSAGE MANAGEMENT
+    function addMessage(sender, content, animated = true) {
+      const container = document.getElementById('messagesContainer');
+      const welcomeMessage = container.querySelector('.welcome-message');
+      
+      if (welcomeMessage) {
+        welcomeMessage.style.animation = 'fadeInUp 0.3s ease reverse';
+        setTimeout(() => welcomeMessage.remove(), 300);
+      }
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      
+      const currentTime = new Date().toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      messageDiv.innerHTML = `
+        <div class="message-avatar">
+          ${sender === 'assistant' ? 'S' : 'U'}
+        </div>
+        <div class="message-content">
+          <div class="message-bubble">
+            ${content}
+          </div>
+          <div class="message-time">${currentTime}</div>
+        </div>
+      `;
+
+      if (animated) {
+        messageDiv.style.animationDelay = `${messageCounter * 0.1}s`;
+        messageCounter++;
+      }
+
+      container.appendChild(messageDiv);
+      scrollToBottom();
+      
+      state.messages.push({ sender, content, timestamp: currentTime });
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+
+      addMessage('user', message);
+      input.value = '';
+      autoResize(input);
+      
+      sendToSabrina(message);
+    }
+
+    function insertQuickMessage(text) {
+      const input = document.getElementById('messageInput');
+      input.value = text;
+      input.focus();
+      autoResize(input);
+    }
+
+    // TYPING INDICATOR
+    function showTyping() {
+      state.isTyping = true;
+      const indicator = document.getElementById('typingIndicator');
+      indicator.classList.add('show');
+      scrollToBottom();
+    }
+
+    function hideTyping() {
+      state.isTyping = false;
+      const indicator = document.getElementById('typingIndicator');
+      indicator.classList.remove('show');
+    }
+
+    // UI HELPERS
+    function scrollToBottom() {
+      const container = document.getElementById('messagesContainer');
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+      }, 100);
+    }
+
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'alert-circle'}" width="16" height="16"></i>
+          ${message}
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      lucide.createIcons();
+      
+      setTimeout(() => notification.classList.add('show'), 100);
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // EVENT LISTENERS
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize theme
+      document.documentElement.setAttribute('data-theme', state.theme);
+      
+      // Initialize Lucide icons
+      lucide.createIcons();
+      
+      // Input handling
+      const input = document.getElementById('messageInput');
+      
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+      
+      input.addEventListener('input', function() {
+        autoResize(this);
+      });
+      
+      // Focus input on load
+      setTimeout(() => input.focus(), 500);
+      
+      console.log('🚀 SABRINA Chat Interface chargée avec succès');
+      console.log(`📡 Webhook configuré: ${WEBHOOK_URL}`);
+    });
+
+    // KEYBOARD SHORTCUTS
+    document.addEventListener('keydown', function(e) {
+      // Ctrl/Cmd + K for quick actions
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        document.querySelector('.quick-action').click();
+      }
+      
+      // Escape to clear input
+      if (e.key === 'Escape') {
+        document.getElementById('messageInput').value = '';
+        autoResize(document.getElementById('messageInput'));
+      }
+    });
+
+    // DEMO MESSAGES (remove in production)
+    setTimeout(() => {
+      if (state.messages.length === 0) {
+        // Uncomment to show demo messages
+        // addMessage('assistant', 'Bonjour ! Je suis prête à vous aider. Que puis-je faire pour vous aujourd\'hui ?');
+      }
+    }, 2000);
+  </script>
+</body>
+</html>
