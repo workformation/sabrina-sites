@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SABRINA Marketing Dashboard | Analytics & Performance</title>
+  
+  <!-- Fonts Premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #DC2626;
+      --accent: #F97316;
+      --bg: #0A0A0B;
+      --card-bg: #111112;
+      --text-primary: #FFFFFF;
+      --text-secondary: #A1A1AA;
+      --border: #27272A;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --sidebar-width: 280px;
+      --sidebar-collapsed: 80px;
+    }
+
+    [data-theme="light"] {
+      --bg: #FAFAFA;
+      --card-bg: #FFFFFF;
+      --text-primary: #0F172A;
+      --text-secondary: #64748B;
+      --border: #E2E8F0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      transition: all 0.3s ease;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: rgba(17, 17, 18, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border);
+      z-index: 1000;
+      transition: width 0.3s ease;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed);
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      white-space: nowrap;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar.collapsed .logo-text {
+      opacity: 0;
+    }
+
+    .sidebar-nav {
+      padding: 20px 0;
+      flex: 1;
+    }
+
+    .nav-item {
+      margin: 4px 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-radius: 12px;
+    }
+
+    .nav-link:hover {
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--primary);
+      transform: translateX(4px);
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(249, 115, 22, 0.1));
+      color: var(--primary);
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .nav-text {
+      white-space: nowrap;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar.collapsed .nav-text {
+      opacity: 0;
+    }
+
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .user-profile:hover {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+      transition: margin-left 0.3s ease;
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: var(--sidebar-collapsed);
+    }
+
+    /* Header */
+    .header {
+      background: rgba(17, 17, 18, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .sidebar-toggle {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--card-bg);
+      color: var(--primary);
+    }
+
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-bar {
+      position: relative;
+      width: 300px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-btn {
+      position: relative;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .header-btn:hover {
+      background: var(--card-bg);
+      color: var(--primary);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .theme-toggle {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+    }
+
+    /* Content */
+    .content {
+      padding: 24px;
+    }
+
+    /* KPI Cards */
+    .kpi-section {
+      margin-bottom: 32px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: between;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .refresh-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .refresh-btn.loading .refresh-icon {
+      animation: spin 1s linear infinite;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .kpi-card {
+      background: rgba(17, 17, 18, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      border-color: var(--primary);
+    }
+
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .kpi-title {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .kpi-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .kpi-icon.revenue {
+      background: linear-gradient(135deg, var(--primary), #EF4444);
+    }
+
+    .kpi-icon.visitors {
+      background: linear-gradient(135deg, var(--accent), #F59E0B);
+    }
+
+    .kpi-icon.conversion {
+      background: linear-gradient(135deg, var(--success), #059669);
+    }
+
+    .kpi-icon.campaigns {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    }
+
+    .kpi-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .kpi-change {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .kpi-change.positive {
+      color: var(--success);
+    }
+
+    .kpi-change.negative {
+      color: var(--error);
+    }
+
+    .kpi-trend {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 80px;
+      height: 30px;
+      opacity: 0.1;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      border-radius: 16px 0 16px 0;
+    }
+
+    /* Charts Section */
+    .charts-section {
+      margin-bottom: 32px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .chart-card {
+      background: rgba(17, 17, 18, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .chart-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.1);
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .chart-period {
+      display: flex;
+      gap: 4px;
+    }
+
+    .period-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .period-btn.active,
+    .period-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .chart-placeholder {
+      height: 300px;
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(249, 115, 22, 0.1));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-placeholder::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    /* Data Table */
+    .table-section {
+      margin-bottom: 32px;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .filter-btn, .export-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover, .export-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .data-table {
+      background: rgba(17, 17, 18, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      background: var(--card-bg);
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .table tr:hover {
+      background: rgba(220, 38, 38, 0.05);
+    }
+
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .campaign-name {
+      font-weight: 600;
+    }
+
+    .campaign-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-active {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .status-paused {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+
+    .status-draft {
+      background: rgba(107, 114, 128, 0.2);
+      color: var(--text-secondary);
+    }
+
+    .campaign-budget {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+    }
+
+    .campaign-performance {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .performance-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .performance-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .performance-value {
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 35px;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar.mobile-open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .header {
+        padding: 12px 16px;
+      }
+
+      .search-bar {
+        width: 200px;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .table-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+      }
+
+      .table-actions {
+        justify-content: center;
+      }
+
+      .data-table {
+        overflow-x: auto;
+      }
+    }
+
+    /* Loading States */
+    .loading {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.2), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 300px;
+      z-index: 2000;
+      animation: slideInRight 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .notification.success {
+      border-color: var(--success);
+    }
+
+    .notification.error {
+      border-color: var(--error);
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .notification-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .notification-message {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">S</div>
+      <div class="logo-text">SABRINA</div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-item">
+        <a href="#" class="nav-link active">
+          <i data-lucide="layout-dashboard" class="nav-icon"></i>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="#" class="nav-link">
+          <i data-lucide="megaphone" class="nav-icon"></i>
+          <span class="nav-text">Campagnes</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="#" class="nav-link">
+          <i data-lucide="users" class="nav-icon"></i>
+          <span class="nav-text">Audience</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="#" class="nav-link">
+          <i data-lucide="bar-chart-3" class="nav-icon"></i>
+          <span class="nav-text">Analytics</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="#" class="nav-link">
+          <i data-lucide="target" class="nav-icon"></i>
+          <span class="nav-text">Conversions</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="#" class="nav-link">
+          <i data-lucide="mail" class="nav-icon"></i>
+          <span class="nav-text">Email Marketing</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="#" class="nav-link">
+          <i data-lucide="share-2" class="nav-icon"></i>
+          <span class="nav-text">Réseaux Sociaux</span>
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="#" class="nav-link">
+          <i data-lucide="settings" class="nav-icon"></i>
+          <span class="nav-text">Paramètres</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">SA</div>
+        <div class="user-info">
+          <div class="user-name">Sarah Admin</div>
+          <div class="user-role">Marketing Manager</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i data-lucide="menu" width="20" height="20"></i>
+        </button>
+        <h1 class="page-title">Dashboard Marketing</h1>
+      </div>
+
+      <div class="header-right">
+        <div class="search-bar">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" class="search-input" placeholder="Rechercher des campagnes, audiences...">
+        </div>
+
+        <div class="header-actions">
+          <button class="header-btn">
+            <i data-lucide="bell" width="18" height="18"></i>
+            <div class="notification-badge"></div>
+          </button>
+          <button class="header-btn">
+            <i data-lucide="help-circle" width="18" height="18"></i>
+          </button>
+          <button class="theme-toggle" id="themeToggle">
+            <i data-lucide="moon" width="16" height="16" id="themeIcon"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- KPI Cards -->
+      <section class="kpi-section">
+        <div class="section-header">
+          <h2 class="section-title">Métriques Clés</h2>
+          <button class="refresh-btn" id="refreshBtn">
+            <i data-lucide="refresh-cw" width="14" height="14" class="refresh-icon"></i>
+            Actualiser
+          </button>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-title">Revenus Totaux</div>
+              <div class="kpi-icon revenue">
+                <i data-lucide="euro" width="20" height="20"></i>
+              </div>
+            </div>
+            <div class="kpi-value">€247,530</div>
+            <div class="kpi-change positive">
+              <i data-lucide="trending-up" width="14" height="14"></i>
+              +12.5% vs mois dernier
+            </div>
+            <div class="kpi-trend"></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-title">Visiteurs Uniques</div>
+              <div class="kpi-icon visitors">
+                <i data-lucide="users" width="20" height="20"></i>
+              </div>
+            </div>
+            <div class="kpi-value">45,231</div>
+            <div class="kpi-change positive">
+              <i data-lucide="trending-up" width="14" height="14"></i>
+              +8.2% vs mois dernier
+            </div>
+            <div class="kpi-trend"></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-title">Taux de Conversion</div>
+              <div class="kpi-icon conversion">
+                <i data-lucide="target" width="20" height="20"></i>
+              </div>
+            </div>
+            <div class="kpi-value">3.42%</div>
+            <div class="kpi-change negative">
+              <i data-lucide="trending-down" width="14" height="14"></i>
+              -2.1% vs mois dernier
+            </div>
+            <div class="kpi-trend"></div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-title">Campagnes Actives</div>
+              <div class="kpi-icon campaigns">
+                <i data-lucide="megaphone" width="20" height="20"></i>
+              </div>
+            </div>
+            <div class="kpi-value">24</div>
+            <div class="kpi-change positive">
+              <i data-lucide="trending-up" width="14" height="14"></i>
+              +4 nouvelles campagnes
+            </div>
+            <div class="kpi-trend"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Charts -->
+      <section class="charts-section">
+        <div class="section-header">
+          <h2 class="section-title">Analyses de Performance</h2>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Revenus par Période</h3>
+              <div class="chart-period">
+                <button class="period-btn active">7J</button>
+                <button class="period-btn">30J</button>
+                <button class="period-btn">90J</button>
+                <button class="period-btn">1A</button>
+              </div>
+            </div>
+            <div class="chart-placeholder">
+              📊 Graphique des revenus par période
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Sources de Trafic</h3>
+            </div>
+            <div class="chart-placeholder">
+              🥧 Répartition des sources de trafic
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Data Table -->
+      <section class="table-section">
+        <div class="table-header">
+          <h2 class="section-title">Campagnes Récentes</h2>
+          <div class="table-actions">
+            <button class="filter-btn">
+              <i data-lucide="filter" width="14" height="14"></i>
+              Filtrer
+            </button>
+            <button class="export-btn">
+              <i data-lucide="download" width="14" height="14"></i>
+              Exporter
+            </button>
+          </div>
+        </div>
+
+        <div class="data-table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nom de la Campagne</th>
+                <th>Statut</th>
+                <th>Budget</th>
+                <th>Impressions</th>
+                <th>Clics</th>
+                <th>CTR</th>
+                <th>Conversions</th>
+                <th>Performance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="campaign-name">Black Friday 2024</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">E-commerce • Créée le 15 Nov</div>
+                </td>
+                <td>
+                  <span class="campaign-status status-active">
+                    <i data-lucide="play-circle" width="12" height="12"></i>
+                    Active
+                  </span>
+                </td>
+                <td class="campaign-budget">€15,000</td>
+                <td>124,567</td>
+                <td>3,421</td>
+                <td>2.75%</td>
+                <td>89</td>
+                <td>
+                  <div class="campaign-performance">
+                    <div class="performance-bar">
+                      <div class="performance-fill" style="width: 78%"></div>
+                    </div>
+                    <span class="performance-value">78%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="campaign-name">Newsletter Décembre</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Email • Créée le 01 Déc</div>
+                </td>
+                <td>
+                  <span class="campaign-status status-active">
+                    <i data-lucide="play-circle" width="12" height="12"></i>
+                    Active
+                  </span>
+                </td>
+                <td class="campaign-budget">€2,500</td>
+                <td>45,231</td>
+                <td>1,876</td>
+                <td>4.15%</td>
+                <td>142</td>
+                <td>
+                  <div class="campaign-performance">
+                    <div class="performance-bar">
+                      <div class="performance-fill" style="width: 92%"></div>
+                    </div>
+                    <span class="performance-value">92%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="campaign-name">Retargeting Facebook</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Social • Créée le 28 Nov</div>
+                </td>
+                <td>
+                  <span class="campaign-status status-paused">
+                    <i data-lucide="pause-circle" width="12" height="12"></i>
+                    En pause
+                  </span>
+                </td>
+                <td class="campaign-budget">€8,000</td>
+                <td>67,892</td>
+                <td>2,143</td>
+                <td>3.16%</td>
+                <td>67</td>
+                <td>
+                  <div class="campaign-performance">
+                    <div class="performance-bar">
+                      <div class="performance-fill" style="width: 65%"></div>
+                    </div>
+                    <span class="performance-value">65%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="campaign-name">Google Ads - Noël</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Search • Créée le 10 Déc</div>
+                </td>
+                <td>
+                  <span class="campaign-status status-draft">
+                    <i data-lucide="edit" width="12" height="12"></i>
+                    Brouillon
+                  </span>
+                </td>
+                <td class="campaign-budget">€12,000</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>
+                  <div class="campaign-performance">
+                    <div class="performance-bar">
+                      <div class="performance-fill" style="width: 0%"></div>
+                    </div>
+                    <span class="performance-value">-</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="campaign-name">Instagram Stories</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Social • Créée le 05 Déc</div>
+                </td>
+                <td>
+                  <span class="campaign-status status-active">
+                    <i data-lucide="play-circle" width="12" height="12"></i>
+                    Active
+                  </span>
+                </td>
+                <td class="campaign-budget">€4,200</td>
+                <td>89,456</td>
+                <td>4,567</td>
+                <td>5.11%</td>
+                <td>201</td>
+                <td>
+                  <div class="campaign-performance">
+                    <div class="performance-bar">
+                      <div class="performance-fill" style="width: 85%"></div>
+                    </div>
+                    <span class="performance-value">85%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina-marketing';
+
+    // State Management
+    const state = {
+      theme: localStorage.getItem('theme') || 'dark',
+      sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+      refreshing: false
+    };
+
+    // Theme Management
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      localStorage.setItem('theme', state.theme);
+      
+      const icon = document.getElementById('themeIcon');
+      icon.setAttribute('data-lucide', state.theme === 'dark' ? 'sun' : 'moon');
+      lucide.createIcons();
+      
+      sendToSabrina('Theme changed', { newTheme: state.theme });
+    }
+
+    // Sidebar Management
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      state.sidebarCollapsed = !state.sidebarCollapsed;
+      
+      if (state.sidebarCollapsed) {
+        sidebar.classList.add('collapsed');
+      } else {
+        sidebar.classList.remove('collapsed');
+      }
+      
+      localStorage.setItem('sidebarCollapsed', state.sidebarCollapsed);
+      sendToSabrina('Sidebar toggled', { collapsed: state.sidebarCollapsed });
+    }
+
+    // Data Refresh
+    async function refreshData() {
+      if (state.refreshing) return;
+      
+      state.refreshing = true;
+      const refreshBtn = document.getElementById('refreshBtn');
+      refreshBtn.classList.add('loading');
+      
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Update KPI values with animation
+        animateKPIValues();
+        
+        showNotification('Données actualisées avec succès', 'success');
+        await sendToSabrina('Data refreshed', { timestamp: new Date().toISOString() });
+        
+      } catch (error) {
+        showNotification('Erreur lors de l\'actualisation', 'error');
+      } finally {
+        state.refreshing = false;
+        refreshBtn.classList.remove('loading');
+      }
+    }
+
+    // Animate KPI Values
+    function animateKPIValues() {
+      const kpiValues = document.querySelectorAll('.kpi-value');
+      kpiValues.forEach((value, index) => {
+        value.style.animation = 'none';
+        setTimeout(() => {
+          value.style.animation = 'pulse 0.6s ease';
+        }, index * 200);
+      });
+    }
+
+    // Webhook Integration
+    async function sendToSabrina(message, data = {}) {
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userMessage: message,
+            timestamp: new Date().toISOString(),
+            source: 'SABRINA_MARKETING_DASHBOARD',
+            page: 'dashboard',
+            ...data
+          })
+        });
+        return await response.json();
+      } catch (error) {
+        console.error('Webhook error:', error);
+        return { error: true };
+      }
+    }
+
+    // Notification System
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.innerHTML = `
+        <div class="notification-header">
+          <div class="notification-title">${type === 'success' ? 'Succès' : type === 'error' ? 'Erreur' : 'Info'}</div>
+          <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+            <i data-lucide="x" width="14" height="14"></i>
+          </button>
+        </div>
+        <div class="notification-message">${message}</div>
+      `;
+      
+      document.body.appendChild(notification);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.remove();
+        }
+      }, 5000);
+    }
+
+    // Chart Period Selection
+    function handlePeriodSelection() {
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('period-btn')) {
+          const container = e.target.closest('.chart-period');
+          container.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+          e.target.classList.add('active');
+          
+          sendToSabrina('Chart period changed', { period: e.target.textContent });
+        }
+      });
+    }
+
+    // Table Interactions
+    function handleTableInteractions() {
+      // Filter button
+      document.querySelector('.filter-btn').addEventListener('click', () => {
+        showNotification('Filtres non implémentés dans cette démo', 'info');
+        sendToSabrina('Filter button clicked');
+      });
+
+      // Export button
+      document.querySelector('.export-btn').addEventListener('click', () => {
+        showNotification('Export en cours...', 'info');
+        sendToSabrina('Export button clicked');
+      });
+
+      // Table row hover effects
+      const tableRows = document.querySelectorAll('.table tr');
+      tableRows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
+          row.style.transform = 'scale(1.01)';
+          row.style.transition = 'transform 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', () => {
+          row.style.transform = 'scale(1)';
+        });
+      });
+    }
+
+    // Search Functionality
+    function handleSearch() {
+      const searchInput = document.querySelector('.search-input');
+      let searchTimeout;
+      
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          if (e.target.value.length > 2) {
+            sendToSabrina('Search performed', { query: e.target.value });
+          }
+        }, 500);
+      });
+    }
+
+    // Navigation
+    function handleNavigation() {
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          // Update active state
+          document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+          e.target.closest('.nav-link').classList.add('active');
+          
+          const pageName = e.target.closest('.nav-link').querySelector('.nav-text').textContent;
+          sendToSabrina('Navigation', { page: pageName });
+          
+          if (pageName !== 'Dashboard') {
+            showNotification(`Navigation vers ${pageName}`, 'info');
+          }
+        });
+      });
+    }
+
+    // Mobile Responsive
+    function handleMobileMenu() {
+      const sidebar = document.getElementById('sidebar');
+      
+      if (window.innerWidth <= 768) {
+        document.addEventListener('click', (e) => {
+          if (!sidebar.contains(e.target) && !e.target.closest('.sidebar-toggle')) {
+            sidebar.classList.remove('mobile-open');
+          }
+        });
+      }
+    }
+
+    // Initialize Application
+    function initializeApp() {
+      // Set initial theme
+      document.documentElement.setAttribute('data-theme', state.theme);
+      const themeIcon = document.getElementById('themeIcon');
+      themeIcon.setAttribute('data-lucide', state.theme === 'dark' ? 'sun' : 'moon');
+      
+      // Set sidebar state
+      const sidebar = document.getElementById('sidebar');
+      if (state.sidebarCollapsed) {
+        sidebar.classList.add('collapsed');
+      }
+      
+      // Initialize Lucide icons
+      lucide.createIcons();
+      
+      // Bind event listeners
+      document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+      document.getElementById('sidebarToggle').addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          document.getElementById('sidebar').classList.toggle('mobile-open');
+        } else {
+          toggleSidebar();
+        }
+      });
+      document.getElementById('refreshBtn').addEventListener('click', refreshData);
+      
+      // Initialize modules
+      handlePeriodSelection();
+      handleTableInteractions();
+      handleSearch();
+      handleNavigation();
+      handleMobileMenu();
+      
+      // Animate initial load
+      setTimeout(() => {
+        document.querySelectorAll('.kpi-card').forEach((card, index) => {
+          card.style.animation = `fadeInUp 0.6s ease ${index * 0.1}s both`;
+        });
+        
+        document.querySelectorAll('.chart-card').forEach((card, index) => {
+          card.style.animation = `fadeInUp 0.6s ease ${(index + 4) * 0.1}s both`;
+        });
+      }, 100);
+      
+      // Send initialization event
+      sendToSabrina('Dashboard initialized', {
+        theme: state.theme,
+        sidebarCollapsed: state.sidebarCollapsed,
+        viewport: { width: window.innerWidth, height: window.innerHeight }
+      });
+      
+      // Welcome notification
+      setTimeout(() => {
+        showNotification('Bienvenue sur SABRINA Marketing Dashboard', 'success');
+      }, 1000);
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      handleMobileMenu();
+    });
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  </script>
+</body>
+</html>
