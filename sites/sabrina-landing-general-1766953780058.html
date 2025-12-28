@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- SABRINA SEO Metadata -->
+    <meta name="description" content="LANDING GENERAL - Site professionnel créé avec SABRINA Web Studio">
+    <meta name="author" content="SABRINA Web Studio">
+    <meta name="generator" content="SABRINA v3.2 ULTRA PRO">
+    <meta property="og:title" content="LANDING GENERAL">
+    <meta property="og:description" content="LANDING GENERAL - Site professionnel créé avec SABRINA Web Studio">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- End SABRINA SEO -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Projet - Excellence et Professionnalisme</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #3B82F6;
+            --primary-rgb: 59,130,246;
+            --accent: #06B6D4;
+            --bg: #0F172A;
+            --text: #FFFFFF;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg: #FFFFFF;
+            --text: #0F172A;
+            --card-bg: rgba(59, 130, 246, 0.05);
+            --border: rgba(59, 130, 246, 0.1);
+            --shadow: rgba(59, 130, 246, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Navigation */
+        #navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            animation: fadeInDown 0.6s ease;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="light"] #navbar {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 10px 25px;
+            border-radius: 50px;
+            color: white !important;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.4);
+        }
+
+        .nav-cta::after {
+            display: none;
+        }
+
+        .theme-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg);
+            background: var(--primary);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 80px;
+            overflow: hidden;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero-title {
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: fadeInUp 0.8s ease, pulse 3s ease-in-out infinite;
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            margin-bottom: 40px;
+            color: var(--text);
+            opacity: 0.9;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 25px rgba(var(--primary-rgb), 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+            backdrop-filter: blur(20px);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            background: rgba(var(--primary-rgb), 0.1);
+        }
+
+        /* Features Section */
+        #features {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 20px;
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 40px rgba(var(--primary-rgb), 0.2);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .feature-icon svg {
+            width: 30px;
+            height: 30px;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .feature-description {
+            color: var(--text);
+            opacity: 0.8;
+            line-height: 1.8;
+        }
+
+        /* Benefits Section */
+        #benefits {
+            padding: 120px 0;
+            background: var(--card-bg);
+        }
+
+        .benefits-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+
+        .benefits-container:nth-child(even) {
+            direction: rtl;
+        }
+
+        .benefits-container:nth-child(even) > * {
+            direction: ltr;
+        }
+
+        .benefits-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.2), rgba(6, 182, 212, 0.2));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefits-image::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.3), transparent);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .benefits-content h3 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .benefits-content p {
+            font-size: 18px;
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .benefits-list {
+            list-style: none;
+        }
+
+        .benefits-list li {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .benefits-list li svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        /* Testimonials Section */
+        #testimonials {
+            padding: 120px 0;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .testimonial-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 40px rgba(var(--primary-rgb), 0.2);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .testimonial-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .testimonial-info p {
+            font-size: 14px;
+            color: var(--text);
+            opacity: 0.6;
+        }
+
+        .testimonial-text {
+            color: var(--text);
+            opacity: 0.9;
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        .testimonial-stars {
+            display: flex;
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .testimonial-stars svg {
+            width: 20px;
+            height: 20px;
+            color: #FBBF24;
+            fill: #FBBF24;
+        }
+
+        /* Pricing Section */
+        #pricing {
+            padding: 120px 0;
+            background: var(--card-bg);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .pricing-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 40px rgba(var(--primary-rgb), 0.3);
+            border-color: var(--primary);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(var(--primary-rgb), 0.2);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 5px 20px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pricing-header h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .pricing-price {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .pricing-price span {
+            font-size: 18px;
+            color: var(--text);
+            opacity: 0.6;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .pricing-features li svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .pricing-button {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* CTA Section */
+        #cta {
+            padding: 120px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 50%, rgba(var(--primary-rgb), 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: 56px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-subtitle {
+            font-size: 20px;
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        /* Footer */
+        #footer {
+            background: var(--card-bg);
+            padding: 60px 0 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h4 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-column ul li a {
+            color: var(--text);
+            opacity: 0.7;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-column ul li a:hover {
+            opacity: 1;
+            color: var(--primary);
+            padding-left: 5px;
+        }
+
+        .footer-brand {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-description {
+            color: var(--text);
+            opacity: 0.7;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text);
+            opacity: 0.7;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 56px;
+            }
+
+            .benefits-container {
+                grid-template-columns: 1fr;
+            }
+
+            .benefits-container:nth-child(even) {
+                direction: ltr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: 42px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .features-grid,
+            .testimonials-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-title {
+                font-size: 36px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 14px;
+            }
+
+            .feature-card,
+            .testimonial-card,
+            .pricing-card {
+                padding: 30px;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        .loading {
+            background: linear-gradient(90deg, transparent, rgba(var(--primary-rgb), 0.1), transparent);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">MonProjet</div>
+            <ul class="nav-links">
+                <li><a href="#hero">Accueil</a></li>
+                <li><a href="#features">Services</a></li>
+                <li><a href="#benefits">Avantages</a></li>
+                <li><a href="#testimonials">Témoignages</a></li>
+                <li><a href="#pricing">Tarifs</a></li>
+                <li><a href="#cta" class="nav-cta">Nous Contacter</a></li>
+            </ul>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button class="theme-toggle" id="themeToggle">
+                    <i data-lucide="sun" id="themeIcon"></i>
+                </button>
+                <button class="mobile-menu-btn">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-background"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Excellence et Professionnalisme</h1>
+                <p class="hero-subtitle">Votre partenaire de confiance pour des solutions sur mesure qui transforment votre vision en réalité</p>
+                <div class="hero-buttons">
+                    <a href="#features" class="btn btn-primary">
+                        En Savoir Plus
+                        <i data-lucide="arrow-right"></i>
+                    </a>
+                    <a href="#cta" class="btn btn-secondary">
+                        Demander un Devis
+                        <i data-lucide="message-circle"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <div class="container">
+            <h2 class="section-title animate-on-scroll">Nos Services Premium</h2>
+            <p class="section-subtitle animate-on-scroll">Des solutions innovantes conçues pour propulser votre succès</p>
+            
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <h3 class="feature-title">Service Premium</h3>
+                    <p class="feature-description">Une qualité exceptionnelle dans chaque détail. Nos services premium garantissent une expérience incomparable et des résultats qui dépassent vos attentes.</p>
+                </div>
+
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <h3 class="feature-title">Expertise Reconnue</h3>
+                    <p class="feature-description">Une équipe de professionnels chevronnés avec plus de 15 ans d'expérience dans le domaine. Nous apportons notre savoir-faire à votre projet.</p>
+                </div>
+
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <h3 class="feature-title">Accompagnement Dédié</h3>
+                    <p class="feature-description">Un conseiller personnel à votre écoute 24/7. Nous vous accompagnons à chaque étape de votre parcours pour assurer votre réussite.</p>
+                </div>
+
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i data-lucide="trending-up"></i>
+                    </div>
+                    <h3 class="feature-title">Résultats Garantis</h3>
+                    <p class="feature-description">Des objectifs clairs et mesurables avec une garantie de satisfaction. Nous nous engageons à livrer des résultats concrets et durables.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits">
+        <div class="container">
+            <h2 class="section-title animate-on-scroll">Pourquoi Nous Choisir</h2>
+            <p class="section-subtitle animate-on-scroll">Des avantages concrets qui font toute la différence</p>
+
+            <div class="benefits-container">
+                <div class="benefits-image animate-on-scroll">
+                    <i data-lucide="target" style="width: 100px; height: 100px;"></i>
+                </div>
+                <div class="benefits-content animate-on-scroll">
+                    <h3>Solutions Personnalisées</h3>
+                    <p>Chaque projet est unique. Nous créons des solutions sur mesure qui répondent précisément à vos besoins spécifiques et à vos objectifs commerciaux.</p>
+                    <ul class="benefits-list">
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Analyse approfondie de vos besoins</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Stratégie adaptée à votre marché</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Flexibilité et évolutivité garanties</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Support continu et mises à jour</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="benefits-container">
+                <div class="benefits-image animate-on-scroll">
+                    <i data-lucide="zap" style="width: 100px; height: 100px;"></i>
+                </div>
+                <div class="benefits-content animate-on-scroll">
+                    <h3>Performance Optimale</h3>
+                    <p>Des solutions haute performance qui accélèrent votre croissance et maximisent votre retour sur investissement grâce à nos technologies de pointe.</p>
+                    <ul class="benefits-list">
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Technologies modernes et éprouvées</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Optimisation continue des performances</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Sécurité renforcée à tous les niveaux</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check-circle"></i>
+                            <span>Scalabilité pour accompagner votre croissance</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials">
+        <div class="container">
+            <h2 class="section-title animate-on-scroll">Ce Que Disent Nos Clients</h2>
+            <p class="section-subtitle animate-on-scroll">La satisfaction client est au cœur de notre mission</p>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar">MG</div>
+                        <div class="testimonial-info">
+                            <h4>Marie Girard</h4>
+                            <p>Directrice Générale</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Une collaboration exceptionnelle qui a transformé notre entreprise. L'équipe est professionnelle, réactive et toujours à l'écoute de nos besoins. Les résultats ont dépassé toutes nos espérances."</p>
+                    <div class="testimonial-stars">
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                    </div>
+                </div>
+
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar">JD</div>
+                        <div class="testimonial-info">
+                            <h4>Jean Dupont</h4>
+                            <p>Chef de Projet</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Un partenaire de confiance qui comprend vraiment nos enjeux. Leur expertise et leur accompagnement personnalisé ont été déterminants dans le succès de notre projet. Je recommande vivement."</p>
+                    <div class="testimonial-stars">
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                    </div>
+                </div>
+
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar">SB</div>
+                        <div class="testimonial-info">
+                            <h4>Sophie Bernard</h4>
+                            <p>Entrepreneuse</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Des solutions innovantes et un accompagnement de qualité. L'équipe a su comprendre mes besoins et proposer des solutions adaptées. Le retour sur investissement est impressionnant."</p>
+                    <div class="testimonial-stars">
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                        <i data-lucide="star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing">
+        <div class="container">
+            <h2 class="section-title animate-on-scroll">Nos Formules</h2>
+            <p class="section-subtitle animate-on-scroll">Des tarifs transparents adaptés à tous les besoins</p>
+
+            <div class="pricing-grid">
+                <div class="pricing-card animate-on-scroll">
+                    <div class="pricing-header">
+                        <h3>Starter</h3>
+                        <p>Idéal pour démarrer</p>
+                    </div>
+                    <div class="pricing-price">
+                        499€
+                        <span>/mois</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Accompagnement personnalisé</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Support par email 24/7</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Mises à jour régulières</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Accès à la documentation</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Tableaux de bord analytics</span>
+                        </li>
+                    </ul>
+                    <a href="#cta" class="btn btn-secondary pricing-button">Choisir ce plan</a>
+                </div>
+
+                <div class="pricing-card featured animate-on-scroll">
+                    <div class="pricing-badge">Populaire</div>
+                    <div class="pricing-header">
+                        <h3>Business</h3>
+                        <p>Pour les professionnels</p>
+                    </div>
+                    <div class="pricing-price">
+                        999€
+                        <span>/mois</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Tout du plan Starter</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Support prioritaire téléphone</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Conseiller dédié</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Intégrations avancées</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Formations en ligne illimitées</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Rapports personnalisés</span>
+                        </li>
+                    </ul>
+                    <a href="#cta" class="btn btn-primary pricing-button">Choisir ce plan</a>
+                </div>
+
+                <div class="pricing-card animate-on-scroll">
+                    <div class="pricing-header">
+                        <h3>Enterprise</h3>
+                        <p>Solutions sur mesure</p>
+                    </div>
+                    <div class="pricing-price">
+                        Sur devis
+                    </div>
+                    <ul class="pricing-features">
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Tout du plan Business</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Solution entièrement personnalisée</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Équipe dédiée à votre projet</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>SLA garanti 99.9%</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Infrastructure sur mesure</span>
+                        </li>
+                        <li>
+                            <i data-lucide="check"></i>
+                            <span>Formations sur site</span>
+                        </li>
+                    </ul>
+                    <a href="#cta" class="btn btn-secondary pricing-button">Nous contacter</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="cta">
+        <div class="cta-background"></div>
+        <div class="container">
+            <div class="cta-content animate-on-scroll">
+                <h2 class="cta-title">Prêt à Commencer ?</h2>
+                <p class="cta-subtitle">Rejoignez des centaines d'entreprises qui nous font confiance pour transformer leur vision en réalité</p>
+                <a href="#contact" class="btn btn-primary" style="font-size: 18px; padding: 18px 50px;">
+                    Demander un Devis Gratuit
+                    <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <div class="footer-brand">MonProjet</div>
+                    <p class="footer-description">Votre partenaire de confiance pour des solutions innovantes et performantes. Nous transformons vos idées en succès concrets.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i data-lucide="facebook"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i data-lucide="twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i data-lucide="linkedin"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i data-lucide="instagram"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="#hero">Accueil</a></li>
+                        <li><a href="#features">Services</a></li>
+                        <li><a href="#benefits">Avantages</a></li>
+                        <li><a href="#pricing">Tarifs</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Ressources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Guides</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Légal</h4>
+                    <ul>
+                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#">Confidentialité</a></li>
+                        <li><a href="#">CGU</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 MonProjet. Tous droits réservés. Conçu avec passion pour l'excellence.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+
+        // Load theme from localStorage
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', currentTheme);
+        updateThemeIcon(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            themeIcon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll Animations with IntersectionObserver
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navbar scroll effect
+        let lastScroll = 0;
+        const navbar = document.getElementById('navbar');
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.style.background = html.getAttribute('data-theme') === 'dark' 
+                    ? 'rgba(15, 23, 42, 0.95)' 
+                    : 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.background = html.getAttribute('data-theme') === 'dark'
+                    ? 'rgba(15, 23, 42, 0.8)'
+                    : 'rgba(255, 255, 255, 0.8)';
+                navbar.style.boxShadow = 'none';
+            }
+
+            lastScroll = currentScroll;
+        });
+
+        // Add loading animation to cards
+        const cards = document.querySelectorAll('.feature-card, .testimonial-card, .pricing-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // Parallax effect for hero background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroBackground = document.querySelector('.hero-background');
+            if (heroBackground) {
+                heroBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Dynamic year in footer
+        const yearSpan = document.querySelector('.footer-bottom p');
+        if (yearSpan) {
+            yearSpan.textContent = yearSpan.textContent.replace('2024', new Date().getFullYear());
+        }
+
+        // Cursor effect on cards
+        document.querySelectorAll('.feature-card, .testimonial-card, .pricing-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>
