@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SABRINA Chat | Interface Conversationnelle</title>
+  
+  <!-- Fonts Premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  
+  <style>
+    /* Variables CSS Premium */
+    :root {
+      --primary: #1E3A5F;
+      --accent: #3B82F6;
+      --bg: #0A0F1C;
+      --surface: #1A1D29;
+      --glass: rgba(255, 255, 255, 0.05);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #E2E8F0;
+      --text-muted: #94A3B8;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --glow-primary: rgba(30, 58, 95, 0.4);
+      --glow-accent: rgba(59, 130, 246, 0.3);
+    }
+
+    [data-theme="light"] {
+      --bg: #FFFFFF;
+      --surface: #F8FAFC;
+      --glass: rgba(0, 0, 0, 0.03);
+      --border: rgba(0, 0, 0, 0.08);
+      --text: #1E293B;
+      --text-muted: #64748B;
+      --glow-primary: rgba(30, 58, 95, 0.1);
+      --glow-accent: rgba(59, 130, 246, 0.1);
+    }
+
+    /* Reset Moderne */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Layout System */
+    .app-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Header Premium */
+    .header {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.6;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .avatar-container {
+      position: relative;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px var(--glow-accent);
+      animation: pulse 2s infinite;
+    }
+
+    .avatar svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+
+    .status-indicator {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      background: var(--success);
+      border: 2px solid var(--bg);
+      border-radius: 50%;
+      animation: statusPulse 1.5s infinite;
+    }
+
+    .header-info h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+      background: linear-gradient(135deg, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-info p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .theme-toggle {
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 12px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .theme-toggle:hover {
+      background: var(--primary);
+      box-shadow: 0 8px 20px var(--glow-primary);
+      transform: translateY(-2px);
+    }
+
+    /* Messages Container */
+    .messages-container {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      background: linear-gradient(180deg, var(--bg) 0%, rgba(30, 58, 95, 0.02) 100%);
+      position: relative;
+    }
+
+    .messages-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .messages-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    .message {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .message.assistant .message-avatar {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      box-shadow: 0 4px 15px var(--glow-accent);
+    }
+
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, var(--accent), #8B5CF6);
+      color: white;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .message-content {
+      flex: 1;
+      max-width: 70%;
+    }
+
+    .message-bubble {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border: none;
+      box-shadow: 0 8px 25px var(--glow-accent);
+    }
+
+    .message-bubble:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .message-text {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      opacity: 0.7;
+    }
+
+    .message.user .message-time {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    .typing-indicator.active {
+      display: flex;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 1rem 1.5rem;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: typingDot 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    /* Input Bar */
+    .input-bar {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .input-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.6;
+    }
+
+    .input-container {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .message-input {
+      width: 100%;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 1rem 1.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--text);
+      resize: none;
+      min-height: 56px;
+      max-height: 120px;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .message-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--glow-accent);
+      transform: translateY(-2px);
+    }
+
+    .message-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-btn {
+      width: 56px;
+      height: 56px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 25px var(--glow-accent);
+    }
+
+    .send-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 30px var(--glow-accent);
+    }
+
+    .send-btn:active {
+      transform: translateY(-1px) scale(0.95);
+    }
+
+    .send-btn.loading {
+      pointer-events: none;
+    }
+
+    .send-btn.loading svg {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-action {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .quick-action:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px var(--glow-primary);
+    }
+
+    /* Welcome Message */
+    .welcome-message {
+      text-align: center;
+      padding: 4rem 2rem;
+      opacity: 0.8;
+    }
+
+    .welcome-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .welcome-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .feature-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(20px);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      border-color: var(--accent);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      color: white;
+    }
+
+    .feature-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes typingDot {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem;
+      }
+
+      .messages-container {
+        padding: 1rem;
+      }
+
+      .message-content {
+        max-width: 85%;
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+      }
+
+      .welcome-features {
+        grid-template-columns: 1fr;
+      }
+
+      .input-container {
+        gap: 0.75rem;
+      }
+
+      .send-btn {
+        width: 48px;
+        height: 48px;
+      }
+
+      .message-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-info h1 {
+        font-size: 1.25rem;
+      }
+
+      .welcome-title {
+        font-size: 1.75rem;
+      }
+
+      .input-bar {
+        padding: 1rem;
+      }
+    }
+
+    /* Dark/Light Mode Transitions */
+    * {
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Loading States */
+    .loading-shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      backdrop-filter: blur(20px);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      border-color: var(--success);
+    }
+
+    .notification.error {
+      border-color: var(--error);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header Premium -->
+    <header class="header">
+      <div class="header-left">
+        <div class="avatar-container">
+          <div class="avatar">
+            <i data-lucide="bot"></i>
+            <div class="status-indicator"></div>
+          </div>
+        </div>
+        <div class="header-info">
+          <h1>SABRINA</h1>
+          <p>Assistant IA Conversationnel</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon" style="display: none;"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Messages Container -->
+    <main class="messages-container" id="messagesContainer">
+      <div class="welcome-message" id="welcomeMessage">
+        <h2 class="welcome-title">Bonjour ! Je suis SABRINA</h2>
+        <p class="welcome-subtitle">Votre assistant IA conversationnel intelligent et créatif</p>
+        
+        <div class="welcome-features">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="message-circle"></i>
+            </div>
+            <h3 class="feature-title">Conversations Naturelles</h3>
+            <p class="feature-desc">Dialoguez avec moi comme avec un humain</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="zap"></i>
+            </div>
+            <h3 class="feature-title">Réponses Rapides</h3>
+            <p class="feature-desc">Obtenez des réponses instantanées et précises</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i data-lucide="shield-check"></i>
+            </div>
+            <h3 class="feature-title">Sécurisé & Privé</h3>
+            <p class="feature-desc">Vos conversations sont protégées</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="message-avatar" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: white;">
+          S
+        </div>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Input Bar -->
+    <footer class="input-bar">
+      <div class="quick-actions">
+        <div class="quick-action" onclick="sendQuickMessage('Bonjour SABRINA !')">👋 Dire bonjour</div>
+        <div class="quick-action" onclick="sendQuickMessage('Peux-tu m\'aider avec un projet ?')">🚀 Aide projet</div>
+        <div class="quick-action" onclick="sendQuickMessage('Quelles sont tes capacités ?')">⭐ Tes capacités</div>
+      </div>
+      
+      <div class="input-container">
+        <div class="input-wrapper">
+          <textarea 
+            class="message-input" 
+            id="messageInput" 
+            placeholder="Tapez votre message ici..."
+            rows="1"
+            onkeydown="handleKeyDown(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+        </div>
+        <button class="send-btn" onclick="sendMessage()">
+          <i data-lucide="send"></i>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Configuration
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+    
+    // État de l'application
+    let isTyping = false;
+    let messageCount = 0;
+
+    // Éléments DOM
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const welcomeMessage = document.getElementById('welcomeMessage');
+
+    // Gestion du thème
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      // Mise à jour des icônes
+      const sunIcon = document.querySelector('.sun-icon');
+      const moonIcon = document.querySelector('.moon-icon');
+      
+      if (newTheme === 'light') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      }
+    }
+
+    // Initialisation du thème
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      
+      const sunIcon = document.querySelector('.sun-icon');
+      const moonIcon = document.querySelector('.moon-icon');
+      
+      if (savedTheme === 'light') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+    }
+
+    // Redimensionnement automatique du textarea
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    // Gestion des touches
+    function handleKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+
+    // Création d'un message
+    function createMessage(content, isUser = false, timestamp = new Date()) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+      messageDiv.style.animationDelay = `${messageCount * 0.1}s`;
+      
+      const timeString = timestamp.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      messageDiv.innerHTML = `
+        <div class="message-avatar">
+          ${isUser ? 'U' : 'S'}
+        </div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <p class="message-text">${content}</p>
+            <div class="message-time">${timeString}</div>
+          </div>
+        </div>
+      `;
+
+      return messageDiv;
+    }
+
+    // Affichage du typing indicator
+    function showTyping() {
+      if (isTyping) return;
+      isTyping = true;
+      typingIndicator.classList.add('active');
+      scrollToBottom();
+    }
+
+    // Masquer le typing indicator
+    function hideTyping() {
+      isTyping = false;
+      typingIndicator.classList.remove('active');
+    }
+
+    // Scroll automatique vers le bas
+    function scrollToBottom() {
+      setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 100);
+    }
+
+    // Masquer le message de bienvenue
+    function hideWelcomeMessage() {
+      if (welcomeMessage) {
+        welcomeMessage.style.opacity = '0';
+        welcomeMessage.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+          welcomeMessage.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    // Envoi d'un message rapide
+    function sendQuickMessage(message) {
+      messageInput.value = message;
+      sendMessage();
+    }
+
+    // Envoi d'un message
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message || isTyping) return;
+
+      // Masquer le message de bienvenue au premier message
+      if (messageCount === 0) {
+        hideWelcomeMessage();
+      }
+
+      // Créer et afficher le message utilisateur
+      const userMessage = createMessage(message, true);
+      messagesContainer.appendChild(userMessage);
+      messageCount++;
+
+      // Vider l'input et réinitialiser la taille
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+
+      // Faire défiler vers le bas
+      scrollToBottom();
+
+      // Afficher le typing indicator
+      showTyping();
+
+      // Bouton d'envoi en état de chargement
+      const sendBtn = document.querySelector('.send-btn');
+      sendBtn.classList.add('loading');
+
+      try {
+        // Envoyer le message au webhook
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userMessage: message,
+            timestamp: new Date().toISOString(),
+            source: 'SABRINA_INTERFACE',
+            sessionId: generateSessionId()
+          })
+        });
+
+        // Simuler un délai de réponse réaliste
+        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+
+        let assistantMessage = "Merci pour votre message ! Je traite votre demande...";
+        
+        if (response.ok) {
+          const data = await response.json();
+          assistantMessage = data.response || data.message || assistantMessage;
+        }
+
+        // Masquer le typing indicator
+        hideTyping();
+
+        // Créer et afficher la réponse de l'assistant
+        const assistantReply = createMessage(assistantMessage, false);
+        messagesContainer.appendChild(assistantReply);
+        messageCount++;
+
+        // Faire défiler vers le bas
+        scrollToBottom();
+
+        // Notification de succès
+        showNotification('Message envoyé avec succès', 'success');
+
+      } catch (error) {
+        console.error('Erreur lors de l\'envoi:', error);
+        
+        // Masquer le typing indicator
+        hideTyping();
+
+        // Message d'erreur
+        const errorMessage = createMessage(
+          "Désolé, une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer.",
+          false
+        );
+        messagesContainer.appendChild(errorMessage);
+        messageCount++;
+
+        // Notification d'erreur
+        showNotification('Erreur lors de l\'envoi du message', 'error');
+
+        scrollToBottom();
+      } finally {
+        // Retirer l'état de chargement du bouton
+        sendBtn.classList.remove('loading');
+      }
+    }
+
+    // Génération d'un ID de session
+    function generateSessionId() {
+      return 'session_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    }
+
+    // Affichage des notifications
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Afficher la notification
+      setTimeout(() => notification.classList.add('show'), 100);
+      
+      // Masquer et supprimer la notification
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => document.body.removeChild(notification), 300);
+      }, 3000);
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialiser Lucide Icons
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      
+      // Initialiser le thème
+      initTheme();
+      
+      // Focus sur l'input
+      messageInput.focus();
+      
+      // Animation d'entrée
+      document.body.style.opacity = '0';
+      setTimeout(() => {
+        document.body.style.opacity = '1';
+        document.body.style.transition = 'opacity 0.5s ease';
+      }, 100);
+    });
+
+    // Gestion du redimensionnement de la fenêtre
+    window.addEventListener('resize', () => {
+      scrollToBottom();
+    });
+  </script>
+</body>
+</html>
