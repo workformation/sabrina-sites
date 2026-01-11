@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SABRINA Chat | Interface Conversationnelle</title>
+  
+  <!-- Fonts Premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #1E3A5F;
+      --accent: #3B82F6;
+      --bg: #0A0E1A;
+      --surface: #1A1F2E;
+      --surface-light: #252B3F;
+      --text: #E2E8F0;
+      --text-muted: #94A3B8;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --border: rgba(226, 232, 240, 0.1);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="light"] {
+      --bg: #FFFFFF;
+      --surface: #F8FAFC;
+      --surface-light: #F1F5F9;
+      --text: #1E293B;
+      --text-muted: #64748B;
+      --border: rgba(30, 41, 59, 0.1);
+      --glass-bg: rgba(255, 255, 255, 0.8);
+      --glass-border: rgba(30, 41, 59, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(30, 58, 95, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 40% 80%, rgba(30, 58, 95, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+    }
+
+    .glow {
+      box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+    }
+
+    .gradient-border {
+      background: linear-gradient(var(--surface), var(--surface)) padding-box,
+                  linear-gradient(135deg, var(--primary), var(--accent)) border-box;
+      border: 2px solid transparent;
+    }
+
+    .hover-lift {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 10;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: -1;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1.2rem;
+      position: relative;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .avatar::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      animation: pulse 2s infinite;
+    }
+
+    .header-info h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-info p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-muted);
+    }
+
+    .theme-toggle:hover {
+      background: var(--surface-light);
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      scroll-behavior: smooth;
+    }
+
+    .messages-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .messages-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    .message {
+      display: flex;
+      gap: 1rem;
+      max-width: 80%;
+      animation: fadeInUp 0.5s ease-out;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+    }
+
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, var(--accent), #60A5FA);
+      color: white;
+    }
+
+    .message.assistant .message-avatar {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+    }
+
+    .message-content {
+      flex: 1;
+      background: var(--surface);
+      padding: 1rem 1.25rem;
+      border-radius: 1.5rem;
+      position: relative;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .message.user .message-content {
+      background: linear-gradient(135deg, var(--accent), #60A5FA);
+      color: white;
+      border-color: transparent;
+    }
+
+    .message.assistant .message-content {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .message-content:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .message-text {
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .message-timestamp {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      opacity: 0.7;
+    }
+
+    .message.user .message-timestamp {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 200px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.5s ease-out forwards;
+    }
+
+    .typing-indicator.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .typing-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .typing-content {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 1rem 1.25rem;
+      border-radius: 1.5rem;
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .input-bar {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+      position: relative;
+      z-index: 10;
+      animation: slideInRight 0.6s ease-out;
+    }
+
+    .input-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: -1;
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .message-input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 2rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.3s ease;
+      resize: none;
+      min-height: 52px;
+      max-height: 120px;
+    }
+
+    .message-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .message-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-button {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .send-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    .send-button:active {
+      transform: scale(0.95);
+    }
+
+    .send-button.loading {
+      pointer-events: none;
+    }
+
+    .send-button.loading::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-action {
+      padding: 0.5rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .quick-action:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .notification {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      padding: 1rem 1.5rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      color: var(--text);
+      font-size: 0.875rem;
+      transform: translateX(400px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      max-width: 300px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .notification.error {
+      border-left: 4px solid var(--error);
+    }
+
+    .welcome-message {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-muted);
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .welcome-message h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-message p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem;
+      }
+
+      .header-info h1 {
+        font-size: 1.25rem;
+      }
+
+      .messages-container {
+        padding: 1rem;
+        gap: 1rem;
+      }
+
+      .message {
+        max-width: 95%;
+      }
+
+      .input-bar {
+        padding: 1rem;
+      }
+
+      .quick-actions {
+        justify-content: center;
+      }
+
+      .welcome-message {
+        padding: 2rem 1rem;
+      }
+
+      .welcome-message h2 {
+        font-size: 1.5rem;
+      }
+
+      .welcome-message p {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .input-container {
+        gap: 0.5rem;
+      }
+
+      .message-input {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.9rem;
+      }
+
+      .send-button {
+        width: 44px;
+        height: 44px;
+      }
+
+      .message-content {
+        padding: 0.875rem 1rem;
+      }
+
+      .message-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+      }
+
+      .typing-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="avatar">S</div>
+      <div class="header-info">
+        <h1>SABRINA</h1>
+        <p>Intelligence Artificielle • En ligne</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Changer le thème">
+        <i data-lucide="sun" class="theme-icon"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="messages-container" id="messagesContainer">
+    <div class="welcome-message">
+      <h2>Bonjour ! Je suis SABRINA</h2>
+      <p>Votre assistante IA avancée, prête à vous aider dans tous vos projets. Posez-moi vos questions, demandez des conseils ou explorons ensemble de nouvelles idées.</p>
+    </div>
+  </div>
+
+  <div class="typing-indicator" id="typingIndicator">
+    <div class="typing-avatar">S</div>
+    <div class="typing-content">
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+      <span style="margin-left: 0.5rem; color: var(--text-muted); font-size: 0.875rem;">SABRINA tape...</span>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="quick-actions">
+      <div class="quick-action" onclick="sendQuickMessage('Aide-moi à créer un site web')">🌐 Créer un site web</div>
+      <div class="quick-action" onclick="sendQuickMessage('Explique-moi les dernières tendances tech')">💡 Tendances tech</div>
+      <div class="quick-action" onclick="sendQuickMessage('Aide-moi à optimiser mon workflow')">⚡ Optimisation</div>
+      <div class="quick-action" onclick="sendQuickMessage('Conseils pour améliorer ma productivité')">📈 Productivité</div>
+    </div>
+    <div class="input-container">
+      <div class="input-wrapper">
+        <textarea
+          class="message-input"
+          id="messageInput"
+          placeholder="Tapez votre message ici..."
+          rows="1"
+          onkeydown="handleKeyDown(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+      </div>
+      <button class="send-button" onclick="sendMessage()" id="sendButton">
+        <i data-lucide="send" style="width: 20px; height: 20px;"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <script>
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+    
+    let messageHistory = [];
+    let isTyping = false;
+
+    // Theme Management
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      const icon = document.querySelector('.theme-icon');
+      icon.setAttribute('data-lucide', newTheme === 'dark' ? 'sun' : 'moon');
+      lucide.createIcons();
+      
+      showNotification(`Thème ${newTheme === 'dark' ? 'sombre' : 'clair'} activé`, 'success');
+    }
+
+    // Initialize theme
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      
+      const icon = document.querySelector('.theme-icon');
+      icon.setAttribute('data-lucide', savedTheme === 'dark' ? 'sun' : 'moon');
+    }
+
+    // Auto-resize textarea
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    // Handle keyboard input
+    function handleKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+
+    // Quick message sender
+    function sendQuickMessage(message) {
+      const input = document.getElementById('messageInput');
+      input.value = message;
+      autoResize(input);
+      sendMessage();
+    }
+
+    // Add message to chat
+    function addMessage(content, isUser = false, animate = true) {
+      const container = document.getElementById('messagesContainer');
+      const welcomeMessage = container.querySelector('.welcome-message');
+      
+      if (welcomeMessage) {
+        welcomeMessage.remove();
+      }
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+      
+      const timestamp = new Date().toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      messageDiv.innerHTML = `
+        <div class="message-avatar">${isUser ? 'U' : 'S'}</div>
+        <div class="message-content">
+          <div class="message-text">${content}</div>
+          <div class="message-timestamp">${timestamp}</div>
+        </div>
+      `;
+
+      container.appendChild(messageDiv);
+
+      if (animate) {
+        setTimeout(() => {
+          messageDiv.style.opacity = '1';
+        }, 100);
+      } else {
+        messageDiv.style.opacity = '1';
+      }
+
+      scrollToBottom();
+      return messageDiv;
+    }
+
+    // Show/hide typing indicator
+    function showTypingIndicator() {
+      const indicator = document.getElementById('typingIndicator');
+      indicator.classList.add('show');
+      isTyping = true;
+      scrollToBottom();
+    }
+
+    function hideTypingIndicator() {
+      const indicator = document.getElementById('typingIndicator');
+      indicator.classList.remove('show');
+      isTyping = false;
+    }
+
+    // Scroll to bottom
+    function scrollToBottom() {
+      const container = document.getElementById('messagesContainer');
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+      }, 100);
+    }
+
+    // Show notification
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add('show');
+
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    // Send message to SABRINA
+    async function sendToSabrina(message, data = {}) {
+      const btn = document.getElementById('sendButton');
+      btn.classList.add('loading');
+      
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userMessage: message,
+            timestamp: new Date().toISOString(),
+            source: 'SABRINA_CHAT_INTERFACE',
+            history: messageHistory.slice(-10),
+            ...data
+          })
+        });
+        
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error('Erreur lors de l\'envoi:', error);
+        showNotification('Erreur de connexion avec SABRINA', 'error');
+        return { error: true, message: 'Désolée, je rencontre un problème de connexion. Pouvez-vous réessayer ?' };
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    // Main send message function
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if (!message || isTyping) return;
+
+      // Add user message
+      addMessage(message, true);
+      messageHistory.push({ role: 'user', content: message });
+      
+      // Clear input
+      input.value = '';
+      autoResize(input);
+      
+      // Show typing indicator
+      showTypingIndicator();
+      
+      // Send to SABRINA
+      const response = await sendToSabrina(message);
+      
+      // Hide typing indicator
+      hideTypingIndicator();
+      
+      // Add SABRINA response
+      const responseText = response.error 
+        ? response.message || 'Je rencontre des difficultés techniques. Pouvez-vous réessayer ?'
+        : response.message || response.response || 'Message reçu ! Comment puis-je vous aider davantage ?';
+      
+      addMessage(responseText, false);
+      messageHistory.push({ role: 'assistant', content: responseText });
+      
+      // Limit history
+      if (messageHistory.length > 20) {
+        messageHistory = messageHistory.slice(-20);
+      }
+    }
+
+    // Initialize application
+    function init() {
+      initTheme();
+      lucide.createIcons();
+      
+      // Focus input
+      document.getElementById('messageInput').focus();
+      
+      // Add some example messages for demo
+      setTimeout(() => {
+        const examples = [
+          { content: "Bonjour ! Comment puis-je vous aider aujourd'hui ?", isUser: false }
+        ];
+        
+        examples.forEach((msg, index) => {
+          setTimeout(() => {
+            addMessage(msg.content, msg.isUser, true);
+            messageHistory.push({ 
+              role: msg.isUser ? 'user' : 'assistant', 
+              content: msg.content 
+            });
+          }, index * 1000);
+        });
+      }, 1000);
+    }
+
+    // Start the application
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
