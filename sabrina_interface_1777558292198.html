@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Technique | SABRINA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --primary: #1E3A5F;
+      --accent: #3B82F6;
+      --bg: #0A0E27;
+      --surface: #1A1F3A;
+      --text: #E2E8F0;
+      --text-dim: #94A3B8;
+      --border: rgba(59, 130, 246, 0.1);
+      --success: #10B981;
+      --error: #EF4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    header {
+      background: rgba(26, 31, 58, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .status-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 2px solid var(--surface);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    .header-info h1 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .header-info p {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+    }
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.05);
+    }
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .messages-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .messages-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .messages-container::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.3);
+      border-radius: 3px;
+    }
+    .message {
+      display: flex;
+      gap: 0.75rem;
+      animation: fadeInUp 0.4s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message.user {
+      flex-direction: row-reverse;
+    }
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, #8B5CF6, #EC4899);
+    }
+    .message-content {
+      max-width: 70%;
+    }
+    .message-bubble {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1rem;
+      line-height: 1.5;
+    }
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(30, 58, 95, 0.3));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .message.user .message-time {
+      justify-content: flex-end;
+    }
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0 1.5rem;
+    }
+    .typing-indicator.active {
+      display: flex;
+      animation: fadeInUp 0.3s ease;
+    }
+    .typing-dots {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: typing 1.4s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-10px); opacity: 1; }
+    }
+    .input-bar {
+      background: rgba(26, 31, 58, 0.8);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+    }
+    .input-wrapper {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    .input-field {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1rem 1.25rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9375rem;
+      resize: none;
+      max-height: 120px;
+      transition: all 0.3s ease;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .send-btn {
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      border: none;
+      border-radius: 1rem;
+      padding: 1rem 1.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .send-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    }
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .send-btn.loading {
+      pointer-events: none;
+    }
+    .send-btn.loading svg {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @media (max-width: 768px) {
+      .message-content { max-width: 85%; }
+      .input-wrapper { flex-direction: column; }
+      .send-btn { width: 100%; justify-content: center; }
+    }
+    [data-theme="light"] {
+      --bg: #F1F5F9;
+      --surface: #FFFFFF;
+      --text: #1E293B;
+      --text-dim: #64748B;
+      --border: rgba(30, 58, 95, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-left">
+        <div class="avatar">
+          <i data-lucide="headphones" style="color: white;"></i>
+          <div class="status-dot"></div>
+        </div>
+        <div class="header-info">
+          <h1>Support Technique SABRINA</h1>
+          <p>En ligne • Répond en quelques secondes</p>
+        </div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <i data-lucide="sun" style="color: var(--text);"></i>
+      </button>
+    </header>
+
+    <div class="messages-container" id="messagesContainer">
+      <div class="message">
+        <div class="message-avatar">
+          <i data-lucide="bot" style="color: white; width: 18px; height: 18px;"></i>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble">
+            Bonjour ! Je suis SABRINA, votre assistante support technique. Comment puis-je vous aider aujourd'hui ?
+          </div>
+          <div class="message-time">
+            <i data-lucide="clock" style="width: 12px; height: 12px;"></i>
+            <span id="initialTime"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="message-avatar">
+        <i data-lucide="bot" style="color: white; width: 18px; height: 18px;"></i>
+      </div>
+      <div class="typing-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-wrapper">
+        <textarea 
+          id="messageInput" 
+          class="input-field" 
+          placeholder="Décrivez votre problème technique..."
+          rows="1"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <span>Envoyer</span>
+          <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+    
+    function formatTime() {
+      return new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    document.getElementById('initialTime').textContent = formatTime();
+
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    messageInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    messageInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function addMessage(text, isUser = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'user' : ''}`;
+      messageDiv.innerHTML = `
+        <div class="message-avatar">
+          <i data-lucide="${isUser ? 'user' : 'bot'}" style="color: white; width: 18px; height: 18px;"></i>
+        </div>
+        <div class="message-content">
+          <div class="message-bubble">${text}</div>
+          <div class="message-time">
+            <i data-lucide="clock" style="width: 12px; height: 12px;"></i>
+            <span>${formatTime()}</span>
+          </div>
+        </div>
+      `;
+      messagesContainer.appendChild(messageDiv);
+      lucide.createIcons();
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message || sendBtn.classList.contains('loading')) return;
+
+      addMessage(message, true);
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+      
+      sendBtn.classList.add('loading');
+      sendBtn.disabled = true;
+      typingIndicator.classList.add('active');
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userMessage: message,
+            timestamp: new Date().toISOString(),
+            source: 'SUPPORT_TECHNIQUE'
+          })
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        const data = await response.json();
+        addMessage(data.response || "J'ai bien reçu votre demande. Un technicien va analyser votre problème et vous répondre rapidement.");
+      } catch (error) {
+        addMessage("Désolé, une erreur s'est produite. Veuillez réessayer.");
+      } finally {
+        typingIndicator.classList.remove('active');
+        sendBtn.classList.remove('loading');
+        sendBtn.disabled = false;
+      }
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      html.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
