@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Formateurs | SABRINA Formation Qualiopi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --primary: #3B82F6;
+      --accent: #06B6D4;
+      --bg: #0F172A;
+      --surface: #1E293B;
+      --border: #334155;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+    }
+    [data-theme="light"] {
+      --bg: #FFFFFF;
+      --surface: #F8FAFC;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: background 0.3s ease;
+    }
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 280px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      transition: transform 0.3s ease, width 0.3s ease;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar.collapsed {
+      width: 80px;
+    }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+    .nav-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .nav-item {
+      padding: 0.875rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+      color: var(--text-muted);
+    }
+    .nav-item:hover {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--primary);
+    }
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.15));
+      color: var(--primary);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      transition: margin-left 0.3s ease;
+    }
+    .main-content.expanded {
+      margin-left: 80px;
+    }
+    .header {
+      background: rgba(30, 41, 59, 0.6);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .toggle-sidebar {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background 0.2s ease;
+    }
+    .toggle-sidebar:hover {
+      background: var(--surface);
+    }
+    .search-bar {
+      position: relative;
+      width: 320px;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    .search-bar input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .theme-toggle:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .notification-btn {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .notification-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 18px;
+      height: 18px;
+      background: var(--danger);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      animation: pulse 2s infinite;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: var(--surface);
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .user-profile:hover {
+      border-color: var(--primary);
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .container {
+      padding: 2rem;
+      max-width: 1600px;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .page-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s ease backwards;
+    }
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(6, 182, 212, 0.2));
+    }
+    .kpi-value {
+      font-size: 2.25rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      margin-bottom: 0.25rem;
+    }
+    .kpi-label {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+    .kpi-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .trend-up {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+    .trend-down {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+    .section-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      animation: fadeInUp 0.6s ease backwards;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .planning-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(59, 130, 246, 0.05);
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      border-left: 3px solid var(--primary);
+      transition: all 0.2s ease;
+    }
+    .planning-item:hover {
+      background: rgba(59, 130, 246, 0.1);
+      transform: translateX(4px);
+    }
+    .planning-time {
+      font-weight: 600;
+      color: var(--primary);
+      min-width: 80px;
+    }
+    .planning-details {
+      flex: 1;
+    }
+    .planning-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .planning-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      text-align: left;
+      padding: 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border);
+    }
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    tr:hover {
+      background: rgba(59, 130, 246, 0.05);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .badge-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+    .badge-info {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--primary);
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .section-grid {
+        grid-template-columns: 1fr;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i data-lucide="graduation-cap" style="color: white;"></i>
+        </div>
+        <div class="logo-text">SABRINA</div>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item active">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </li>
+        <li class="nav-item">
+          <i data-lucide="calendar"></i>
+          <span>Planning</span>
+        </li>
+        <li class="nav-item">
+          <i data-lucide="users"></i>
+          <span>Formateurs</span>
+        </li>
+        <li class="nav-item">
+          <i data-lucide="book-open"></i>
+          <span>Formations</span>
+        </li>
+        <li class="nav-item">
+          <i data-lucide="euro"></i>
+          <span>Tarifs</span>
+        </li>
+        <li class="nav-item">
+          <i data-lucide="file-text"></i>
+          <span>Devis</span>
+        </li>
+        <li class="nav-item">
+          <i data-lucide="award"></i>
+          <span>Qualiopi</span>
+        </li>
+        <li class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Paramètres</span>
+        </li>
+      </ul>
+    </aside>
+    <main class="main-content" id="mainContent">
+      <header class="header">
+        <div class="header-left">
+          <button class="toggle-sidebar" onclick="toggleSidebar()">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="search-bar">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" placeholder="Rechercher une formation, un formateur...">
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="theme-toggle" onclick="toggleTheme()">
+            <i data-lucide="moon"></i>
+          </button>
+          <button class="notification-btn">
+            <i data-lucide="bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-profile">
+            <div class="avatar">JD</div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.9rem;">Jean Dupont</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Formateur Senior</div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div class="container">
+        <h1 class="page-title">Tableau de Bord Formateurs</h1>
+        <p class="page-subtitle">Organismes de formation certifiés Qualiopi</p>
+        <div class="kpi-grid">
+          <div class="kpi-card" style="animation-delay: 0.1s;">
+            <div class="kpi-card::before"></div>
+            <div class="kpi-header">
+              <div class="kpi-icon">
+                <i data-lucide="users" style="color: var(--primary);"></i>
+              </div>
+              <span class="kpi-trend trend-up">
+                <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i>
+                +12%
+              </span>
+            </div>
+            <div class="kpi-value">247</div>
+            <div class="kpi-label">Apprenants Actifs</div>
+          </div>
+          <div class="kpi-card" style="animation-delay: 0.2s;">
+            <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2));">
+              <i data-lucide="calendar-check" style="color: var(--success);"></i>
+            </div>
+            <span class="kpi-trend trend-up">
+              <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i>
+              +8%
+            </span>
+            <div class="kpi-value">18</div>
+            <div class="kpi-label">Sessions ce Mois</div>
+          </div>
+          <div class="kpi-card" style="animation-delay: 0.3s;">
+            <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(6, 182, 212, 0.2));">
+              <i data-lucide="star" style="color: var(--warning);"></i>
+            </div>
+            <span class="kpi-trend trend-up">
+              <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i>
+              +0.3
+            </span>
+            <div class="kpi-value">4.8/5</div>
+            <div class="kpi-label">Satisfaction Moyenne</div>
+          </div>
+          <div class="kpi-card" style="animation-delay: 0.4s;">
+            <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(239, 68, 68, 0.2));">
+              <i data-lucide="euro" style="color: var(--accent);"></i>
+            </div>
+            <span class="kpi-trend trend-up">
+              <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i>
+              +15%
+            </span>
+            <div class="kpi-value">42K€</div>
+            <div class="kpi-label">CA ce Trimestre</div>
+          </div>
+        </div>
+        <div class="section-grid">
+          <div class="card" style="animation-delay: 0.5s;">
+            <div class="card-header">
+              <h3 class="card-title">Planning de la Semaine</h3>
+              <button class="btn btn-primary">
+                <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+                Nouvelle Session
+              </button>
+            </div>
+            <div class="planning-item">
+              <div class="planning-time">09:00</div>
+              <div class="planning-details">
+                <div class="planning-title">Formation Excel Avancé</div>
+                <div class="planning-meta">
+                  <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
+                  Salle A • 12 participants
+                </div>
+              </div>
+              <span class="badge badge-success">Confirmée</span>
+            </div>
+            <div class="planning-item">
+              <div class="planning-time">14:00</div>
+              <div class="planning-details">
+                <div class="planning-title">Management d'Équipe</div>
+                <div class="planning-meta">
+                  <i data-lucide="video" style="width: 14px; height: 14px;"></i>
+                  Visio • 8 participants
+                </div>
+              </div>
+              <span class="badge badge-info">À distance</span>
+            </div>
+            <div class="planning-item">
+              <div class="planning-time">16:30</div>
+              <div class="planning-details">
+                <div class="planning-title">PowerPoint Professionnel</div>
+                <div class="planning-meta">
+                  <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
+                  Salle B • 15 participants
+                </div>
+              </div>
+              <span class="badge badge-warning">En attente</span>
+            </div>
+          </div>
+          <div class="card" style="animation-delay: 0.6s;">
+            <div class="card-header">
+              <h3 class="card-title">Financements OPCO/CPF</h3>
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 600;">OPCO Atlas</span>
+                <span style="color: var(--primary); font-weight: 600;">28 000€</span>
+              </div>
+              <div style="background: var(--bg); height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="width: 70%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));"></div>
+              </div>
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 600;">CPF Mon Compte</span>
+                <span style="color: var(--success); font-weight: 600;">14 500€</span>
+              </div>
+              <div style="background: var(--bg); height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="width: 45%; height: 100%; background: linear-gradient(90deg, var(--success), var(--accent));"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 600;">OPCO Commerce</span>
+                <span style="color: var(--warning); font-weight: 600;">9 200€</span>
+              </div>
+              <div style="background: var(--bg); height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="width: 30%; height: 100%; background: linear-gradient(90deg, var(--warning), var(--accent));"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="animation-delay: 0.7s;">
+          <div class="card-header">
+            <h3 class="card-title">Demandes de Devis Récentes</h3>
+            <button class="btn btn-primary" onclick="sendToSabrina('Nouvelle demande de devis')">
+              <i data-lucide="file-plus" style="width: 18px; height: 18px;"></i>
+              Nouveau Devis
+            </button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entreprise</th>
+                  <th>Formation</th>
+                  <th>Participants</th>
+                  <th>Budget</th>
+                  <th>Statut</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Tech Solutions SAS</strong></td>
+                  <td>Formation DevOps</td>
+                  <td>12</td>
+                  <td>8 400€</td>
+                  <td><span class="badge badge-warning">En cours</span></td>
+                  <td><i data-lucide="eye" style="cursor: pointer; color: var(--primary);"></i></td>
+                </tr>
+                <tr>
+                  <td><strong>ComptaPlus</strong></td>
+                  <td>Gestion Budgétaire</td>
+                  <td>8</td>
+                  <td>5 600€</td>
+                  <td><span class="badge badge-success">Accepté</span></td>
+                  <td><i data-lucide="eye" style="cursor: pointer; color: var(--primary);"></i></td>
+                </tr>
+                <tr>
+                  <td><strong>Marketing Agency</strong></td>
+                  <td>Social Media Strategy</td>
+                  <td>15</td>
+                  <td>10 500€</td>
+                  <td><span class="badge badge-info">Nouveau</span></td>
+                  <td><i data-lucide="eye" style="cursor: pointer; color: var(--primary);"></i></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      sidebar.classList.toggle('collapsed');
+      mainContent.classList.toggle('expanded');
+    }
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+    async function sendToSabrina(message, data = {}) {
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userMessage: message,
+            timestamp: new Date().toISOString(),
+            source: 'SABRINA_FORMATION_DASHBOARD',
+            ...data
+          })
+        });
+        return await response.json();
+      } catch (error) {
+        console.error('Erreur webhook:', error);
+        return { error: true };
+      }
+    }
+    lucide.createIcons();
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</body>
+</html>
