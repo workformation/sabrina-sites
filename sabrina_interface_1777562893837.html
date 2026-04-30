@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Technique | SABRINA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --primary: #1E3A5F;
+      --accent: #3B82F6;
+      --bg: #0A0E1A;
+      --surface: #151922;
+      --text: #E2E8F0;
+      --text-muted: #94A3B8;
+      --border: rgba(59, 130, 246, 0.1);
+      --success: #10B981;
+      --gradient: linear-gradient(135deg, #1E3A5F 0%, #3B82F6 100%);
+    }
+    [data-theme="light"] {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --text: #1E293B;
+      --text-muted: #64748B;
+      --border: rgba(30, 58, 95, 0.1);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+    }
+    .container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(21, 25, 34, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 100;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    .avatar i {
+      color: white;
+    }
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: var(--success);
+      border-radius: 50%;
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      border: 2px solid var(--surface);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+    .header-info h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+    .header-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .icon-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      transform: translateY(-2px);
+    }
+    .icon-btn i {
+      width: 20px;
+      height: 20px;
+      color: var(--accent);
+    }
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .messages-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .messages-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .messages-container::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.3);
+      border-radius: 10px;
+    }
+    .message {
+      display: flex;
+      gap: 1rem;
+      animation: fadeInUp 0.5s ease;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message:nth-child(1) { animation-delay: 0.1s; }
+    .message:nth-child(2) { animation-delay: 0.2s; }
+    .message:nth-child(3) { animation-delay: 0.3s; }
+    .message:nth-child(4) { animation-delay: 0.4s; }
+    .message.user {
+      flex-direction: row-reverse;
+    }
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+    .message-avatar i {
+      width: 18px;
+      height: 18px;
+      color: white;
+    }
+    .message-content {
+      max-width: 70%;
+    }
+    .message-bubble {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .message.user .message-bubble {
+      background: var(--gradient);
+      border: none;
+      color: white;
+    }
+    .message-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .message.user .message-time {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      padding: 0 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .typing-indicator.active {
+      display: flex;
+    }
+    .typing-dots {
+      display: flex;
+      gap: 6px;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+    }
+    .input-bar {
+      padding: 1.5rem;
+      background: rgba(21, 25, 34, 0.8);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+    }
+    .input-wrapper {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-end;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .input-container {
+      flex: 1;
+      position: relative;
+    }
+    textarea {
+      width: 100%;
+      padding: 1rem 3rem 1rem 1.25rem;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: none;
+      min-height: 52px;
+      max-height: 120px;
+      transition: all 0.3s ease;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    .attach-btn {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: color 0.3s ease;
+    }
+    .attach-btn:hover {
+      color: var(--accent);
+    }
+    .send-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: var(--gradient);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    }
+    .send-btn:active {
+      transform: translateY(0);
+    }
+    .send-btn i {
+      color: white;
+      width: 22px;
+      height: 22px;
+    }
+    .send-btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .send-btn.loading i {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @media (max-width: 768px) {
+      .message-content { max-width: 85%; }
+      header { padding: 1rem; }
+      .messages-container { padding: 1.5rem 1rem; }
+      .input-bar { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-left">
+        <div class="avatar">
+          <i data-lucide="headphones"></i>
+          <div class="status-dot"></div>
+        </div>
+        <div class="header-info">
+          <h1>Support Technique</h1>
+          <p>En ligne - Temps de réponse ~2 min</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeToggle">
+          <i data-lucide="moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="messages-container" id="messagesContainer">
+      <div class="message">
+        <div class="message-avatar"><i data-lucide="bot"></i></div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-text">Bonjour ! Je suis votre assistant support technique SABRINA. Comment puis-je vous aider aujourd'hui ?</div>
+            <div class="message-time"><i data-lucide="clock" style="width:12px;height:12px"></i> 14:32</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="message-avatar"><i data-lucide="bot"></i></div>
+      <div class="typing-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-wrapper">
+        <div class="input-container">
+          <textarea id="messageInput" placeholder="Décrivez votre problème technique..." rows="1"></textarea>
+          <button class="attach-btn"><i data-lucide="paperclip"></i></button>
+        </div>
+        <button class="send-btn" id="sendBtn"><i data-lucide="send"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const themeToggle = document.getElementById('themeToggle');
+
+    lucide.createIcons();
+
+    function getTime() {
+      return new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function addMessage(text, isUser = false) {
+      const message = document.createElement('div');
+      message.className = `message ${isUser ? 'user' : ''}`;
+      message.innerHTML = `
+        <div class="message-avatar"><i data-lucide="${isUser ? 'user' : 'bot'}"></i></div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-text">${text}</div>
+            <div class="message-time"><i data-lucide="clock" style="width:12px;height:12px"></i> ${getTime()}</div>
+          </div>
+        </div>
+      `;
+      messagesContainer.appendChild(message);
+      lucide.createIcons();
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      addMessage(text, true);
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+
+      typingIndicator.classList.add('active');
+      sendBtn.classList.add('loading');
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userMessage: text,
+            timestamp: new Date().toISOString(),
+            source: 'SUPPORT_CHAT'
+          })
+        });
+        const data = await response.json();
+        setTimeout(() => {
+          typingIndicator.classList.remove('active');
+          addMessage(data.response || "Message reçu. Un technicien va vous répondre dans quelques instants.");
+        }, 1500);
+      } catch (error) {
+        typingIndicator.classList.remove('active');
+        addMessage("Erreur de connexion. Veuillez réessayer.", false);
+      } finally {
+        sendBtn.classList.remove('loading');
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    messageInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    themeToggle.addEventListener('click', () => {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      themeToggle.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}"></i>`;
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
