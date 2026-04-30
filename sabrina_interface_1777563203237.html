@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Technique | SABRINA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --primary: #1E3A5F;
+      --accent: #3B82F6;
+      --bg: #0A0E1A;
+      --surface: #151B2E;
+      --text: #E4E7EB;
+      --text-dim: #9CA3AF;
+      --border: rgba(59, 130, 246, 0.2);
+      --glow: rgba(59, 130, 246, 0.3);
+    }
+    [data-theme="light"] {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --text: #1E293B;
+      --text-dim: #64748B;
+      --border: rgba(30, 58, 95, 0.2);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(21, 27, 46, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .avatar::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      background: #10B981;
+      border: 2px solid var(--surface);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    .header-info h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .header-info p {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #10B981;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 20px var(--glow);
+    }
+    #messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+    #messages-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    #messages-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #messages-container::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    .message {
+      display: flex;
+      gap: 0.75rem;
+      max-width: 80%;
+      animation: fadeInUp 0.4s ease;
+    }
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, #8B5CF6, #EC4899);
+    }
+    .message-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .message-bubble {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0.875rem 1.125rem;
+      line-height: 1.6;
+    }
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+    }
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      padding: 0 0.5rem;
+    }
+    #typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      animation: fadeInUp 0.3s ease;
+    }
+    #typing-indicator.active {
+      display: flex;
+    }
+    .typing-dots {
+      display: flex;
+      gap: 0.25rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .typing-dots span {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+    .typing-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .typing-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    #input-bar {
+      background: rgba(21, 27, 46, 0.8);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+    }
+    .input-wrapper {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px var(--glow);
+    }
+    #messageInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      padding: 0.75rem;
+    }
+    #messageInput::placeholder {
+      color: var(--text-dim);
+    }
+    .send-btn {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    .send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px var(--glow);
+    }
+    .send-btn:active {
+      transform: translateY(0);
+    }
+    .send-btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .quick-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .quick-action {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .quick-action:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+      30% {
+        transform: translateY(-8px);
+        opacity: 1;
+      }
+    }
+    @media (max-width: 768px) {
+      header {
+        padding: 1rem;
+      }
+      .header-info h1 {
+        font-size: 1rem;
+      }
+      #messages-container {
+        padding: 1rem;
+      }
+      .message {
+        max-width: 90%;
+      }
+      #input-bar {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="avatar">
+        <i data-lucide="headphones" size="24" color="white"></i>
+      </div>
+      <div class="header-info">
+        <h1>Support Technique SABRINA</h1>
+        <p><span class="status-dot"></span>En ligne - Temps de réponse ~1min</p>
+      </div>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <i data-lucide="moon" size="20"></i>
+    </button>
+  </header>
+  <div id="messages-container">
+    <div class="message">
+      <div class="message-avatar">S</div>
+      <div class="message-content">
+        <div class="message-bubble">Bonjour ! Je suis SABRINA, votre assistante support technique. Comment puis-je vous aider aujourd'hui ?</div>
+        <div class="message-time">Maintenant</div>
+      </div>
+    </div>
+  </div>
+  <div id="typing-indicator">
+    <div class="message-avatar">S</div>
+    <div class="typing-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  <div id="input-bar">
+    <div class="input-wrapper">
+      <input type="text" id="messageInput" placeholder="Décrivez votre problème..." onkeypress="handleKeyPress(event)">
+      <button class="send-btn" onclick="sendMessage()">
+        <span>Envoyer</span>
+        <i data-lucide="send" size="18"></i>
+      </button>
+    </div>
+    <div class="quick-actions">
+      <div class="quick-action" onclick="quickSend('Problème de connexion')">🔌 Connexion</div>
+      <div class="quick-action" onclick="quickSend('Bug application')">🐛 Bug</div>
+      <div class="quick-action" onclick="quickSend('Question facturation')">💳 Facturation</div>
+      <div class="quick-action" onclick="quickSend('Réinitialiser mot de passe')">🔑 Mot de passe</div>
+    </div>
+  </div>
+  <script>
+    const WEBHOOK_URL = 'https://n8n.srv1121126.hstgr.cloud/webhook/sabrina';
+    const messagesContainer = document.getElementById('messages-container');
+    const messageInput = document.getElementById('messageInput');
+    const typingIndicator = document.getElementById('typing-indicator');
+    
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      const icon = document.querySelector('.theme-toggle i');
+      icon.setAttribute('data-lucide', newTheme === 'dark' ? 'moon' : 'sun');
+      lucide.createIcons();
+    }
+    
+    function addMessage(text, isUser = false) {
+      const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'user' : ''}`;
+      messageDiv.innerHTML = `
+        <div class="message-avatar">${isUser ? 'V' : 'S'}</div>
+        <div class="message-content">
+          <div class="message-bubble">${text}</div>
+          <div class="message-time">${time}</div>
+        </div>
+      `;
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function showTyping() {
+      typingIndicator.classList.add('active');
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function hideTyping() {
+      typingIndicator.classList.remove('active');
+    }
+    
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+      
+      addMessage(message, true);
+      messageInput.value = '';
+      showTyping();
+      
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userMessage: message,
+            timestamp: new Date().toISOString(),
+            source: 'SUPPORT_CHAT'
+          })
+        });
+        
+        const data = await response.json();
+        setTimeout(() => {
+          hideTyping();
+          addMessage(data.response || "J'ai bien reçu votre demande. Un technicien vous contactera sous peu.");
+        }, 1500);
+      } catch (error) {
+        hideTyping();
+        addMessage("Désolé, une erreur s'est produite. Veuillez réessayer.");
+      }
+    }
+    
+    function quickSend(message) {
+      messageInput.value = message;
+      sendMessage();
+    }
+    
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
+    
+    lucide.createIcons();
+  </script>
+</body>
+</html>
